@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Интерактивная школа — заставка и карта</title>
+<style>
+:root{
+--bg:#0f1724; --card:#0b1220; --accent:#06b6d4; --muted:#94a3b8; --glass: rgba(255,255,255,0.04);
+--maxw:1200px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,#071029 0%, #091426 100%);}
+.app{height:100vh;display:flex;align-items:center;justify-content:center}
+.screen{width:100%;height:100%;max-width:var(--maxw);margin:0 auto;position:relative;overflow:hidden;border-radius:6px}
+
+
+.slides{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.slide{min-width:100%;height:100%;padding:40px;display:flex;flex-direction:column;gap:20px;align-items:flex-start;justify-content:space-between;transition:transform .6s ease,opacity .6s ease}
+.slide-inner{background:var(--glass);backdrop-filter:blur(6px);border-radius:14px;padding:28px;width:calc(100% - 56px);height:calc(100% - 160px);display:flex;flex-direction:column;gap:18px}
+
+
+.header{display:flex;gap:18px;align-items:center}
+.logo{width:72px;height:72px;background:linear-gradient(135deg,var(--accent),#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#031124}
+.title{font-size:22px;font-weight:700}
+.subtitle{color:var(--muted);font-size:14px}
+
+
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.card{background:rgba(255,255,255,0.02);padding:18px;border-radius:12px;min-width:220px;flex:1}
+.big{flex:2;min-width:320px}
+.name{font-size:20px;font-weight:700}
+.meta{color:var(--muted);font-size:13px;margin-top:6px}
+
+
+.footer{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.hint{pointer-events:auto;background:linear-gradient(90deg, rgba(6,182,212,0.12), rgba(124,58,237,0.08));padding:12px 22px;border-radius:999px;font-weight:600;color:var(--accent);backdrop-filter:blur(4px);box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+
+
+.overlay{position:absolute;inset:0;background:linear-gradient(180deg, rgba(2,6,23,0.85), rgba(2,6,23,0.95));display:flex;flex-direction:column;padding:28px;gap:18px;transform:translateY(100%);transition:transform .4s ease}
+.overlay.open{transform:translateY(0)}
+.menu-top{display:flex;align-items:center;justify-content:space-between}
+.close-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted)}
+.floors{display:flex;flex-direction:column;gap:12px;overflow:auto;padding-right:6px}
+.floor-row{display:flex;gap:10px;align-items:stretch}
+.room{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:10px;min-width:160px;flex:1;cursor:pointer;transition:background .3s}
+.room:hover{background:rgba(255,255,255,0.06)}
+.room .r-title{font-weight:700}
+.room .r-sub{color:var(--muted);font-size:13px;margin-top:6px}
+
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .3s ease, visibility .3s ease;z-index:50}
+.modal.show{visibility:visible;opacity:1}
+.modal-content{background:var(--card);border-radius:14px;padding:24px;max-width:400px;width:90%;text-align:center}
+.modal-content h3{margin:0;font-size:20px;margin-bottom:8px}
+.modal-content p{margin:6px 0;color:var(--muted)}
+.modal-content button{margin-top:18px;padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+
+
+@media (max-width:800px){
+.slide-inner{padding:18px}
+.logo{width:56px;height:56px}
+.title{font-size:18px}
+.card{min-width:180px}
+.room{min-width:140px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="screen" id="screen">
+<div class="slides" id="slides"></div>
+<div class="footer"><div class="hint" id="hint">menyuga kirish uchun ekranga bosing</div></div>
+<div class="overlay" id="overlay" aria-hidden="true">
+<div class="menu-top">
+<div>
+<div style="font-weight:800;font-size:18px">Схема школы — 4 этажа</div>
+<div style="color:var(--muted);font-size:13px;margin-top:4px">Нажмите комнату, чтобы увидеть подробности</div>
+</div>
+<button class="close-btn" id="closeMenu">Закрыть</button>
+</div>
+<div class="floors" id="floors"></div>
+</div>
+<div class="modal" id="modal">
+<div class="modal-content" id="modalContent"></div>
+</div>
+</div>
+</div>
+
+
+<script>
+const SHEET_ID = 'ВАШ_GOOGLE_SHEET_ID'; // Вставьте сюда ID Google Sheet
+const API_KEY = 'ВАШ_API_KEY'; // Google API Key
+const RANGE = 'Лист1!A1:E100';
+
+
+async function loadData() {
+const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`);
+</html>http://localhost:8000/index.html
