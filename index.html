@@ -150,7 +150,7 @@
   <script>
     const SHEET_ID = "VSTAV_SHEET_ID";
     const API_KEY = "VSTAV_API_KEY";
-    const RANGE_MAIN = "Лист1!A1:K100";
+    const RANGE_MAIN = "Лист1!A1:M100";
     const RANGE_SCHEDULE = "Schedule!A1:F100";
 
     async function loadSheet(range) {
@@ -202,7 +202,15 @@
           const lesson = getCurrentLesson(schedule, r.room);
           const subject = lesson ? lesson.subject : "— Dars yo‘q —";
           const teacher = lesson ? lesson.teacher : "";
-          card.innerHTML = `<b>${r.room}</b> — ${r.class}<br><span style="color:#00c4ff">${subject}</span><br><small>${teacher}</small>`;
+          card.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;">
+              <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);">
+              <div>
+                <b>${r.room}</b> — ${r.class}<br>
+                <span style="color:#00c4ff">${subject}</span><br>
+                <small>${teacher}</small>
+              </div>
+            </div>`;
           card.onclick = () => showModal({ ...r, subject, teacher });
           rooms.appendChild(card);
         });
@@ -221,7 +229,15 @@
     function renderSlides(DATA) {
       const slides = document.getElementById("slides");
       slides.innerHTML = "";
-      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi", `<div class="card"><b>${DATA.best_student_week.name}</b> (${DATA.best_student_week.class})<br>Bahosi: ${DATA.best_student_week.score}</div>`));
+
+      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi", `
+        <div class="card" style="display:flex;flex-direction:column;align-items:center;">
+          <img src="${DATA.best_student_week.student_img || 'https://i.imgur.com/xO5T4.gif'}" 
+               style="width:180px;height:180px;object-fit:cover;border-radius:50%;margin-bottom:16px;border:3px solid var(--accent);" alt="O‘quvchi rasmi">
+          <b>${DATA.best_student_week.name}</b> (${DATA.best_student_week.class})<br>
+          <span>Bahosi: ${DATA.best_student_week.score}</span>
+        </div>`));
+
       slides.appendChild(makeSlide("🏫 Haftaning eng yaxshi sinfi", `<div class="card"><b>${DATA.best_class_week.class}</b><br>O‘rtacha baho: ${DATA.best_class_week.avg}</div>`));
       slides.appendChild(makeSlide("🗓 So‘nggi voqealar", DATA.recent_events.map(e => `<div class="card"><b>${e.title}</b><div>${e.date}</div></div>`).join("")));
       slides.appendChild(makeSlide("🏆 Chorakdagi eng yaxshi sinflar", DATA.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join("")));
@@ -235,7 +251,14 @@
     function showModal(r) {
       const modal = document.getElementById("modal");
       const cont = document.getElementById("modal-content");
-      cont.innerHTML = `<h3>${r.room} — ${r.class}</h3><p>${r.subject}</p><p>O‘qituvchi: ${r.teacher}</p><button onclick="closeModal()">Yopish</button>`;
+      cont.innerHTML = `
+        <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}"
+             style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:16px;border:3px solid var(--accent);" alt="O‘qituvchi rasmi">
+        <h3>${r.room} — ${r.class}</h3>
+        <p style="font-size:24px;color:#00c4ff;">${r.subject}</p>
+        <p style="margin-top:6px;">O‘qituvchi: <b>${r.teacher}</b></p>
+        <button onclick="closeModal()">Yopish</button>
+      `;
       modal.classList.add("show");
     }
     function closeModal() { document.getElementById("modal").classList.remove("show"); }
