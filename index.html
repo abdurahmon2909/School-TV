@@ -168,7 +168,7 @@
     <div class="slides" id="slides"></div>
 
     <div class="footer">
-      <div class="hint" id="hint">🏠 Bosh sahifa</div>
+      <div class="hint" id="hint">📋 Menyuga kirish uchun ekranga bosing</div>
     </div>
 
     <div class="overlay" id="overlay">
@@ -188,27 +188,20 @@
     const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
     const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
     const RANGE_MAIN = "Лист1!A1:M100";
-    const RANGE_SCHEDULE = "schedule!A1:F100"; // исправленный регистр
+    const RANGE_SCHEDULE = "Schedule!A1:F100";
 
     async function loadSheet(range) {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(res.statusText);
-        const json = await res.json();
-        const [headers, ...rows] = json.values || [[]];
-        if (!headers.length) return [];
-        return rows.map(r => Object.fromEntries(headers.map((h, i) => [h, r[i] || ""])));
-      } catch (err) {
-        console.error("Google Sheets load error:", err);
-        return [];
-      }
+      const res = await fetch(url);
+      const json = await res.json();
+      const [headers, ...rows] = json.values;
+      return rows.map(r => Object.fromEntries(headers.map((h, i) => [h, r[i]])));
     }
 
     function parseData(rows) {
       return {
-        best_student_week: rows.find(r => r.type === "best_student_week") || {},
-        best_class_week: rows.find(r => r.type === "best_class_week") || {},
+        best_student_week: rows.find(r => r.type === "best_student_week"),
+        best_class_week: rows.find(r => r.type === "best_class_week"),
         recent_events: rows.filter(r => r.type === "recent_event"),
         top_classes_quarter: rows.filter(r => r.type === "top_class_quarter"),
         floors: Object.values(rows.filter(r => r.type === "room_info").reduce((acc, r) => {
@@ -219,56 +212,16 @@
       };
     }
 
-    function makeSlide(title, content) {
-      const s = document.createElement("div");
-      s.className = "slide";
-      s.innerHTML = `<div class="slide-inner"><h1>${title}</h1>${content}</div>`;
-      return s;
-    }
-
-    function renderSlides(DATA) {
-      const slides = document.getElementById("slides");
-      slides.innerHTML = "";
-
-      // Eng yaxshi o‘quvchi
-      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi", `
-        <div class="card" style="display:flex;flex-direction:column;align-items:center;">
-          <img src="${
-            (DATA.best_student_week && DATA.best_student_week.student_img && DATA.best_student_week.student_img.includes('http'))
-              ? DATA.best_student_week.student_img
-              : 'https://i.imgur.com/xO5T4.gif'
-          }"
-          style="width:220px;height:220px;object-fit:cover;border-radius:50%;margin-bottom:20px;
-          border:4px solid var(--accent);box-shadow:0 0 20px rgba(0,196,255,0.3);animation:fadeIn 1.5s ease;"
-          alt="O‘quvchi rasmi">
-          <b style="font-size:1.8em;">${DATA.best_student_week?.name || "—"}</b> 
-          <div style="font-size:1.4em;color:#9fdfff;">${DATA.best_student_week?.class || ""}</div>
-          <div style="margin-top:10px;font-size:1.3em;">Bahosi: ${DATA.best_student_week?.score || "-"}</div>
-        </div>`));
-
-      // Eng yaxshi sinf
-      slides.appendChild(makeSlide(
-        "🏫 Haftaning eng yaxshi sinfi",
-        DATA.best_class_week?.class
-          ? `<div class="card"><b>${DATA.best_class_week.class}</b><br>O‘rtacha baho: ${DATA.best_class_week.avg || "-"}</div>`
-          : `<div class="card">Ma’lumot yo‘q</div>`
-      ));
-
-      // So‘nggi voqealar
-      slides.appendChild(makeSlide(
-        "🗓 So‘nggi voqealar",
-        DATA.recent_events.length
-          ? DATA.recent_events.map(e => `<div class="card"><b>${e.title}</b><div>${e.date}</div></div>`).join("")
-          : `<div class="card">Ma’lumot yo‘q</div>`
-      ));
-
-      // Chorakdagi eng yaxshi sinflar
-      slides.appendChild(makeSlide(
-        "🏆 Chorakdagi eng yaxshi sinflar",
-        DATA.top_classes_quarter.length
-          ? DATA.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join("")
-          : `<div class="card">Ma’lumot yo‘q</div>`
-      ));
+    function getCurrentLesson(schedule, room) {
+      const now = new Date();
+      const current = now.getHours() * 60 + now.getMinutes();
+      return schedule.find(s => {
+        const [sh, sm] = s.start.split(":").map(Number);
+        const [eh, em] = s.end.split(":").map(Number);
+        const start = sh * 60 + sm;
+        const end = eh * 60 + em;
+        return s.room === room && current >= start && current <= end;
+      }) || null;
     }
 
     function renderFloors(DATA, schedule) {
@@ -283,17 +236,20 @@
         f.rooms.forEach(r => {
           const card = document.createElement("div");
           card.className = "room";
+          const lesson = getCurrentLesson(schedule, r.room);
+          const subject = lesson ? lesson.subject : "— Dars yo‘q —";
+          const teacher = lesson ? lesson.teacher : "";
           card.innerHTML = `
             <div style="display:flex;align-items:center;gap:10px;">
-              <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}"
-                   alt="O‘qituvchi rasmi"
-                   style="width:70px;height:70px;border-radius:12px;object-fit:cover;border:2px solid var(--accent);">
+              <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" 
+                   style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);">
               <div>
                 <b>${r.room}</b> — ${r.class}<br>
-                <small style="color:#00c4ff">${r.subject || ""}</small><br>
-                <small>${r.teacher || ""}</small>
+                <span style="color:#00c4ff">${subject}</span><br>
+                <small>${teacher}</small>
               </div>
             </div>`;
+          card.onclick = () => showModal({ ...r, subject, teacher });
           rooms.appendChild(card);
         });
         div.appendChild(rooms);
@@ -301,17 +257,68 @@
       });
     }
 
+    function makeSlide(title, content) {
+      const s = document.createElement("div");
+      s.className = "slide";
+      s.innerHTML = `<div class="slide-inner"><h1>${title}</h1>${content}</div>`;
+      return s;
+    }
+
+    function renderSlides(DATA) {
+      const slides = document.getElementById("slides");
+      slides.innerHTML = "";
+
+      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi", `
+        <div class="card" style="display:flex;flex-direction:column;align-items:center;">
+          <img src="${
+            (DATA.best_student_week &&
+             DATA.best_student_week.student_img &&
+             DATA.best_student_week.student_img.includes('http'))
+               ? DATA.best_student_week.student_img
+               : 'https://i.imgur.com/xO5T4.gif'
+          }"
+          style="width:220px;height:220px;object-fit:cover;border-radius:50%;margin-bottom:20px;
+          border:4px solid var(--accent);box-shadow:0 0 20px rgba(0,196,255,0.3);animation:fadeIn 1.5s ease;"
+          alt="O‘quvchi rasmi">
+          <b style="font-size:1.8em;">${DATA.best_student_week?.name || "—"}</b> 
+          <div style="font-size:1.4em;color:#9fdfff;">${DATA.best_student_week?.class || ""}</div>
+          <div style="margin-top:10px;font-size:1.3em;">Bahosi: ${DATA.best_student_week?.score || "-"}</div>
+        </div>`));
+
+      slides.appendChild(makeSlide("🏫 Haftaning eng yaxshi sinfi", `<div class="card"><b>${DATA.best_class_week?.class || "-"}</b><br>O‘rtacha baho: ${DATA.best_class_week?.avg || "-"}</div>`));
+      slides.appendChild(makeSlide("🗓 So‘nggi voqealar", DATA.recent_events.map(e => `<div class="card"><b>${e.title}</b><div>${e.date}</div></div>`).join("")));
+      slides.appendChild(makeSlide("🏆 Chorakdagi eng yaxshi sinflar", DATA.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join("")));
+    }
+
     function showSlide(i) {
       const slides = document.querySelectorAll(".slide");
       slides.forEach((el, idx) => { el.style.transform = `translateX(${(idx - i) * 100}%)`; });
     }
 
+    function showModal(r) {
+      const modal = document.getElementById("modal");
+      const cont = document.getElementById("modal-content");
+      cont.innerHTML = `
+        <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}"
+             style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:16px;border:3px solid var(--accent);" alt="O‘qituvchi rasmi">
+        <h3>${r.room} — ${r.class}</h3>
+        <p style="font-size:24px;color:#00c4ff;">${r.subject}</p>
+        <p style="margin-top:6px;">O‘qituvchi: <b>${r.teacher}</b></p>
+        <button onclick="closeModal()">Yopish</button>`;
+      modal.classList.add("show");
+    }
+
+    function closeModal() { document.getElementById("modal").classList.remove("show"); }
+
     document.getElementById("hint").onclick = () => document.getElementById("overlay").classList.add("open");
     document.getElementById("close").onclick = () => document.getElementById("overlay").classList.remove("open");
 
     function updateClock() {
+      const clock = document.getElementById("clock");
       const now = new Date();
-      document.getElementById("clock").textContent = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+      const h = now.getHours().toString().padStart(2, "0");
+      const m = now.getMinutes().toString().padStart(2, "0");
+      clock.textContent = `${h}:${m}`;
     }
 
     (async () => {
@@ -324,11 +331,7 @@
       showSlide(0);
 
       let i = 0;
-      setInterval(() => {
-        i = (i + 1) % document.querySelectorAll(".slide").length;
-        showSlide(i);
-      }, 5000);
-
+      setInterval(() => { i = (i + 1) % document.querySelectorAll(".slide").length; showSlide(i); }, 5000);
       setInterval(updateClock, 1000);
       updateClock();
 
@@ -340,3 +343,4 @@
   </script>
 </body>
 </html>
+
