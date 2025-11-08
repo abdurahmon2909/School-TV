@@ -30,7 +30,6 @@
       overflow: hidden;
     }
 
-    /* vaqt */
     #clock {
       position: absolute;
       top: 20px;
@@ -41,7 +40,6 @@
       letter-spacing: 1px;
     }
 
-    /* slaydlar */
     .slides { position: absolute; inset: 0; display: flex; transition: transform 0.5s ease; }
     .slide { min-width: 100%; height: 100%; padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .slide-inner {
@@ -62,7 +60,6 @@
       font-size: 26px;
     }
 
-    /* pastki qism */
     .footer { position: absolute; bottom: 40px; width: 100%; text-align: center; }
     .hint {
       display: inline-block;
@@ -76,7 +73,6 @@
       backdrop-filter: blur(8px);
     }
 
-    /* menyu (qavatlar) */
     .overlay {
       position: absolute;
       inset: 0;
@@ -105,7 +101,6 @@
     }
     .room:hover { background: rgba(0,196,255,0.3); }
 
-    /* modal oyna */
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; }
     .modal.show { display: flex; }
     .modal-content {
@@ -148,7 +143,7 @@
   </div>
 
   <script>
-    const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
+    const SHEET_ID = "D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
     const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
     const RANGE_MAIN = "Лист1!A1:M100";
     const RANGE_SCHEDULE = "Schedule!A1:F100";
@@ -204,7 +199,8 @@
           const teacher = lesson ? lesson.teacher : "";
           card.innerHTML = `
             <div style="display:flex;align-items:center;gap:10px;">
-              <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);">
+              <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" 
+                   style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);">
               <div>
                 <b>${r.room}</b> — ${r.class}<br>
                 <span style="color:#00c4ff">${subject}</span><br>
@@ -232,8 +228,11 @@
 
       slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi", `
         <div class="card" style="display:flex;flex-direction:column;align-items:center;">
-          <img src="${DATA.best_student_week.student_img || 'https://i.imgur.com/xO5T4.gif'}" 
-               style="width:180px;height:180px;object-fit:cover;border-radius:50%;margin-bottom:16px;border:3px solid var(--accent);" alt="O‘quvchi rasmi">
+          <img src="${(DATA.best_student_week.student_img && DATA.best_student_week.student_img.startsWith('http')) 
+            ? DATA.best_student_week.student_img 
+            : 'https://i.imgur.com/xO5T4.gif'}"
+            style="width:180px;height:180px;object-fit:cover;border-radius:50%;margin-bottom:16px;border:3px solid var(--accent);" 
+            alt="O‘quvchi rasmi">
           <b>${DATA.best_student_week.name}</b> (${DATA.best_student_week.class})<br>
           <span>Bahosi: ${DATA.best_student_week.score}</span>
         </div>`));
@@ -288,7 +287,6 @@
       setInterval(updateClock, 1000);
       updateClock();
 
-      // avtomatik yangilash
       setInterval(async () => {
         const newSchedule = await loadSheet(RANGE_SCHEDULE);
         renderFloors(DATA, newSchedule);
@@ -297,4 +295,3 @@
   </script>
 </body>
 </html>
-
