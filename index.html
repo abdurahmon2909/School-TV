@@ -54,7 +54,8 @@
 
     .rooms { display: flex; flex-wrap: wrap; gap: 10px; }
 
-    .room { background: var(--card-bg); padding: 12px 18px; border-radius: 10px; cursor: pointer; }
+    .room { background: var(--card-bg); padding: 12px 18px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+    .room:hover { background: rgba(6,182,212,0.2); }
 
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; }
     .modal.show { display: flex; }
@@ -83,16 +84,15 @@
   <script>
     const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
     const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
-    const RANGE = "Лист1!A1:K100";
+    const RANGE_MAIN = "Лист1!A1:K100";
+    const RANGE_SCHEDULE = "Schedule!A1:F100";
 
-    async function loadData() {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+    async function loadSheet(range) {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
       const res = await fetch(url);
       const json = await res.json();
-      const rows = json.values;
-      const headers = rows[0];
-      const items = rows.slice(1).map(r => Object.fromEntries(headers.map((h, i) => [h, r[i]])));
-      return parseData(items);
+      const [headers, ...rows] = json.values;
+      return rows.map(r => Object.fromEntries(headers.map((h, i) => [h, r[i]])));
     }
 
     function parseData(rows) {
@@ -109,51 +109,37 @@
       };
     }
 
-    function renderSlides(DATA){
-      const slides = document.getElementById('slides');
-      slides.innerHTML = '';
-
-      slides.appendChild(makeSlide('Лучший ученик недели', `
-        <div class="card"><b>${DATA.best_student_week.name}</b> (${DATA.best_student_week.class})<br>Балл: ${DATA.best_student_week.score}</div>`));
-
-      slides.appendChild(makeSlide('Лучший класс недели', `
-        <div class="card"><b>${DATA.best_class_week.class}</b><br>Средний балл: ${DATA.best_class_week.avg}</div>`));
-
-      slides.appendChild(makeSlide('Недавние события', 
-        DATA.recent_events.map(e=>`<div class="card"><b>${e.title}</b><div>${e.date}</div></div>`).join('')
-      ));
-
-      slides.appendChild(makeSlide('Лучшие классы за квартал', 
-        DATA.top_classes_quarter.map(c=>`<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join('')
-      ));
+    // Определить текущий урок
+    function getCurrentLesson(schedule, room) {
+      const now = new Date();
+      const current = now.getHours() * 60 + now.getMinutes();
+      const currentLesson = schedule.find(s => {
+        const [sh, sm] = s.start.split(":").map(Number);
+        const [eh, em] = s.end.split(":").map(Number);
+        const startMin = sh * 60 + sm;
+        const endMin = eh * 60 + em;
+        return s.room === room && current >= startMin && current <= endMin;
+      });
+      return currentLesson || null;
     }
 
-    function makeSlide(title,content){
-      const s=document.createElement('div');
-      s.className='slide';
-      s.innerHTML=`<div class="slide-inner"><h1>${title}</h1>${content}</div>`;
-      return s;
-    }
-
-    function showSlide(i){
-      const slides=document.querySelectorAll('.slide');
-      slides.forEach((el,idx)=>{el.style.transform=`translateX(${(idx-i)*100}%)`;});
-    }
-
-    function renderFloors(DATA){
-      const floors=document.getElementById('floors');
-      floors.innerHTML='';
-      DATA.floors.sort((a,b)=>b.floor-a.floor).forEach(f=>{
-        const div=document.createElement('div');
-        div.className='floor';
-        div.innerHTML=`<h2>Этаж ${f.floor}</h2>`;
-        const rooms=document.createElement('div');
-        rooms.className='rooms';
-        f.rooms.forEach(r=>{
-          const card=document.createElement('div');
-          card.className='room';
-          card.textContent=`${r.room} — ${r.class}`;
-          card.onclick=()=>showModal(r);
+    function renderFloors(DATA, schedule) {
+      const floors = document.getElementById("floors");
+      floors.innerHTML = "";
+      DATA.floors.sort((a, b) => b.floor - a.floor).forEach(f => {
+        const div = document.createElement("div");
+        div.className = "floor";
+        div.innerHTML = `<h2>Этаж ${f.floor}</h2>`;
+        const rooms = document.createElement("div");
+        rooms.className = "rooms";
+        f.rooms.forEach(r => {
+          const card = document.createElement("div");
+          card.className = "room";
+          const lesson = getCurrentLesson(schedule, r.room);
+          const subject = lesson ? lesson.subject : "— Нет пары —";
+          const teacher = lesson ? lesson.teacher : "";
+          card.innerHTML = `<b>${r.room}</b> — ${r.class}<br><span style="color:#06b6d4">${subject}</span><br><small>${teacher}</small>`;
+          card.onclick = () => showModal({ ...r, subject, teacher });
           rooms.appendChild(card);
         });
         div.appendChild(rooms);
@@ -161,24 +147,55 @@
       });
     }
 
-    function showModal(r){
-      const modal=document.getElementById('modal');
-      const cont=document.getElementById('modal-content');
-      cont.innerHTML=`<h3>${r.room} — ${r.class}</h3><p>${r.subject}</p><p>Учитель: ${r.teacher}</p><button onclick="closeModal()">Закрыть</button>`;
-      modal.classList.add('show');
+    function makeSlide(title, content) {
+      const s = document.createElement("div");
+      s.className = "slide";
+      s.innerHTML = `<div class="slide-inner"><h1>${title}</h1>${content}</div>`;
+      return s;
     }
 
-    function closeModal(){document.getElementById('modal').classList.remove('show');}
+    function renderSlides(DATA) {
+      const slides = document.getElementById("slides");
+      slides.innerHTML = "";
+      slides.appendChild(makeSlide("Лучший ученик недели", `<div class="card"><b>${DATA.best_student_week.name}</b> (${DATA.best_student_week.class})<br>Балл: ${DATA.best_student_week.score}</div>`));
+      slides.appendChild(makeSlide("Лучший класс недели", `<div class="card"><b>${DATA.best_class_week.class}</b><br>Средний балл: ${DATA.best_class_week.avg}</div>`));
+      slides.appendChild(makeSlide("Недавние события", DATA.recent_events.map(e => `<div class="card"><b>${e.title}</b><div>${e.date}</div></div>`).join("")));
+      slides.appendChild(makeSlide("Лучшие классы за квартал", DATA.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join("")));
+    }
 
-    document.getElementById('hint').onclick=()=>document.getElementById('overlay').classList.add('open');
-    document.getElementById('close').onclick=()=>document.getElementById('overlay').classList.remove('open');
+    function showSlide(i) {
+      const slides = document.querySelectorAll(".slide");
+      slides.forEach((el, idx) => { el.style.transform = `translateX(${(idx - i) * 100}%)`; });
+    }
 
-    (async ()=>{
-      const DATA=await loadData();
+    function showModal(r) {
+      const modal = document.getElementById("modal");
+      const cont = document.getElementById("modal-content");
+      cont.innerHTML = `<h3>${r.room} — ${r.class}</h3><p>${r.subject}</p><p>Учитель: ${r.teacher}</p><button onclick="closeModal()">Закрыть</button>`;
+      modal.classList.add("show");
+    }
+    function closeModal() { document.getElementById("modal").classList.remove("show"); }
+
+    document.getElementById("hint").onclick = () => document.getElementById("overlay").classList.add("open");
+    document.getElementById("close").onclick = () => document.getElementById("overlay").classList.remove("open");
+
+    (async () => {
+      const mainData = await loadSheet(RANGE_MAIN);
+      const scheduleData = await loadSheet(RANGE_SCHEDULE);
+      const DATA = parseData(mainData);
+
       renderSlides(DATA);
-      renderFloors(DATA);
+      renderFloors(DATA, scheduleData);
       showSlide(0);
-      let i=0;setInterval(()=>{i=(i+1)%document.querySelectorAll('.slide').length;showSlide(i);},5000);
+
+      let i = 0;
+      setInterval(() => { i = (i + 1) % document.querySelectorAll(".slide").length; showSlide(i); }, 7000);
+
+      // автообновление каждые 60 сек
+      setInterval(async () => {
+        const scheduleDataNew = await loadSheet(RANGE_SCHEDULE);
+        renderFloors(DATA, scheduleDataNew);
+      }, 60000);
     })();
   </script>
 </body>
