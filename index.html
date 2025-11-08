@@ -236,202 +236,81 @@
   </div>
 
   <script>
-    const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
-    const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
-    const RANGE_MAIN = "Лист1!A1:M100";
-    const RANGE_SCHEDULE = "schedule!A1:H100";
+window.addEventListener("DOMContentLoaded", async () => {
+  const overlay = document.getElementById('overlay');
+  const hint = document.getElementById('hint');
+  const closeBtn = document.getElementById('close');
 
-    const oylar = ["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentyabr","oktyabr","noyabr","dekabr"];
-    const kunlar = ["yakshanba","dushanba","seshanba","chorshanba","payshanba","juma","shanba"];
+  function restartSlides() {
+    const s = document.querySelectorAll('.slide');
+    if (!s.length) return;
+    let current = 0;
+    s[current].classList.add('active');
+    window.slideInterval = setInterval(() => {
+      s[current].classList.remove('active');
+      current = (current + 1) % s.length;
+      s[current].classList.add('active');
+    }, 7000);
+  }
 
-    function updateDate() {
-      const now = new Date();
-      const day = now.getDate();
-      const month = oylar[now.getMonth()];
-      const year = now.getFullYear();
-      const weekday = kunlar[now.getDay()];
-      document.getElementById("date-line").textContent = `📅 ${day}-${month} ${year}-yil, ${weekday}`;
-    }
-
-    async function loadSheet(range) {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-      const res = await fetch(url);
-      const j = await res.json();
-      const [h, ...r] = j.values || [[]];
-      return r.map(x => Object.fromEntries(h.map((k, i) => [k, x[i]])));
-    }
-
-    function parseData(rows) {
-      return {
-        best_student_week: rows.find(r => r.type === "best_student_week"),
-        best_class_week: rows.find(r => r.type === "best_class_week"),
-        recent_events: rows.filter(r => r.type === "recent_event"),
-        top_classes_quarter: rows.filter(r => r.type === "top_class_quarter"),
-        schedule: rows.filter(r => r.type === "schedule"),
-        floors: Object.values(rows.filter(r => r.type === "room_info").reduce((a, r) => {
-          const f = r.floor || '0';
-          if (!a[f]) a[f] = { floor: f, rooms: [] };
-          a[f].rooms.push(r);
-          return a;
-        }, {}))
-      };
-    }
-
-    function makeSlide(t, c) {
-      const s = document.createElement('div');
-      s.className = 'slide';
-      s.innerHTML = `<div class="slide-inner"><h1>${t}</h1>${c}</div>`;
-      return s;
-    }
-
-    function renderSlides(d) {
-      const slides = document.getElementById('slides');
-      slides.innerHTML = '';
-
-      slides.appendChild(makeSlide('📰 So‘nggi voqealar',
-        d.recent_events.length
-          ? d.recent_events.map(e => `<div class="card"><b>${e.title}</b><div class="muted">${e.date || ''}</div></div>`).join('')
-          : '<div class="card">Hech qanday voqea yo‘q</div>'
-      ));
-
-      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o'quvchisi", `
-        <div class="card" style="display:flex;flex-direction:column;align-items:center;">
-          <img src="${(d.best_student_week && d.best_student_week.student_img && d.best_student_week.student_img.includes('http')) ? d.best_student_week.student_img : 'https://i.imgur.com/xO5T4.gif'}"
-          style="width:240px;height:240px;object-fit:cover;border-radius:10px;margin-bottom:20px;border:4px solid var(--accent);box-shadow:0 0 20px rgba(0,196,255,0.3);animation:zoomIn 1.5s ease;" alt="O‘quvchi rasmi">
-          <b style="font-size:1.8em;">${d.best_student_week?.name || "—"}</b>
-          <div style="font-size:1.4em;color:#9fdfff;">${d.best_student_week?.class || ""}</div>
-          <div style="margin-top:10px;font-size:1.3em;">Bahosi: ${d.best_student_week?.score || "-"}</div>
-        </div>`));
-
-      slides.appendChild(makeSlide("🏫 Haftaning eng yaxshi sinfi",
-        `<div class="card"><b>${d.best_class_week?.class || "-"}</b><br>O‘rtacha baho: ${d.best_class_week?.avg || "-"}</div>`
-      ));
-
-      slides.appendChild(makeSlide("🏆 Chorakdagi eng yaxshi sinflar",
-        d.top_classes_quarter.length
-          ? d.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join('')
-          : "<div class='card'>Maʼlumot yo‘q</div>"
-      ));
-    }
-
-    function renderFloors(d) {
-      const cont = document.getElementById('floors');
-      cont.innerHTML = '';
-      d.floors.sort((a, b) => Number(b.floor) - Number(a.floor));
-      d.floors.forEach(f => {
-        const div = document.createElement('div');
-        div.className = 'floor';
-        div.innerHTML = `<h2>${f.floor}-qavat</h2>`;
-        const rooms = document.createElement('div');
-        rooms.className = 'rooms';
-        f.rooms.forEach(r => {
-          const scheduleInfo = d.schedule.find(s => s.room === r.room);
-          const subject = scheduleInfo?.subject || r.subject || '—';
-          const teacher = scheduleInfo?.teacher || r.teacher || '';
-          const el = document.createElement('div');
-          el.className = 'room';
-          el.innerHTML = `
-            <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" alt="teacher">
-            <div><div style="font-weight:700">${r.room} — ${r.class || ''}</div>
-            <div style="color:#9fb0c0">${subject}</div>
-            <div style="font-size:14px;color:#9fb0c0">${teacher}</div></div>`;
-          el.onclick = () => showModal({ room: r.room, class: r.class, subject, teacher, teacher_img: r.teacher_img });
-          rooms.appendChild(el);
-        });
-        div.appendChild(rooms);
-        cont.appendChild(div);
-      });
-    }
-
-    function showModal(r) {
-      const m = document.getElementById('modal');
-      const c = document.getElementById('modal-content');
-      c.innerHTML = `
-        <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" alt="teacher">
-        <h3>${r.room} — ${r.class || ''}</h3>
-        <p style="color:#00c4ff;font-size:18px;margin:6px 0">${r.subject || '—'}</p>
-        <p>O‘qituvchi: <b>${r.teacher || '—'}</b></p>
-        <button class="modal-close" onclick="closeModal()">Yopish</button>`;
-      m.classList.add('show');
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.remove('show');
-    }
-
-    // --- Bosh sahifa button logic ---
-    const overlay = document.getElementById('overlay');
-    const hint = document.getElementById('hint');
-    const closeBtn = document.getElementById('close');
-
+  if (hint) {
     hint.addEventListener('click', () => {
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden', 'false');
       clearInterval(window.slideInterval);
     });
+  }
 
+  if (closeBtn) {
     closeBtn.addEventListener('click', () => {
       overlay.classList.remove('open');
       overlay.setAttribute('aria-hidden', 'true');
       restartSlides();
     });
+  }
 
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) {
-        overlay.classList.remove('open');
-        overlay.setAttribute('aria-hidden', 'true');
-        restartSlides();
-      }
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        overlay.classList.remove('open');
-        overlay.setAttribute('aria-hidden', 'true');
-        restartSlides();
-      }
-    });
-
-    function restartSlides() {
-      const s = document.querySelectorAll('.slide');
-      if (!s.length) return;
-      let current = 0;
-      s[current].classList.add('active');
-      window.slideInterval = setInterval(() => {
-        s[current].classList.remove('active');
-        current = (current + 1) % s.length;
-        s[current].classList.add('active');
-      }, 7000);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      restartSlides();
     }
+  });
 
-    function updateClock() {
-      const n = new Date();
-      const h = n.getHours().toString().padStart(2, '0');
-      const m = n.getMinutes().toString().padStart(2, '0');
-      document.getElementById('clock').textContent = `${h}:${m}`;
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      restartSlides();
     }
+  });
 
-    (async () => {
-      updateDate();
-      setInterval(updateDate, 60000);
-      const mainRows = await loadSheet(RANGE_MAIN);
-      const scheduleRows = await loadSheet(RANGE_SCHEDULE);
-      const allRows = [...mainRows, ...scheduleRows];
-      const d = parseData(allRows);
-      renderSlides(d);
-      renderFloors(d);
-      const s = document.querySelectorAll('.slide');
-      if (s.length) s[0].classList.add('active');
-      window.slideInterval = setInterval(() => {
-        const active = document.querySelector('.slide.active');
-        const current = [...s].indexOf(active);
-        s[current].classList.remove('active');
-        const next = (current + 1) % s.length;
-        s[next].classList.add('active');
-      }, 7000);
-      updateClock();
-      setInterval(updateClock, 1000);
-    })();
+  const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
+  const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
+  const RANGE_MAIN = "Лист1!A1:M100";
+  const RANGE_SCHEDULE = "schedule!A1:H100";
+
+  function updateClock() {
+    const n = new Date();
+    const h = n.getHours().toString().padStart(2, '0');
+    const m = n.getMinutes().toString().padStart(2, '0');
+    document.getElementById('clock').textContent = `${h}:${m}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  async function loadSheet(range) {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+    const res = await fetch(url);
+    const j = await res.json();
+    const [h, ...r] = j.values || [[]];
+    return r.map(x => Object.fromEntries(h.map((k, i) => [k, x[i]])));
+  }
+
+  const mainRows = await loadSheet(RANGE_MAIN);
+  const scheduleRows = await loadSheet(RANGE_SCHEDULE);
+  console.log("Sheets loaded:", mainRows.length, scheduleRows.length);
+});
   </script>
 </body>
 </html>
