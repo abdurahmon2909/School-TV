@@ -357,34 +357,50 @@
       document.getElementById('modal').classList.remove('show');
     }
 
+    // --- ✅ Кнопка Bosh sahifa ---
     const overlay = document.getElementById('overlay');
     const hint = document.getElementById('hint');
+    const closeBtn = document.getElementById('close');
+
     hint.onclick = () => {
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden', 'false');
-      current = 0;
-      showSlide(current);
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      clearInterval(window.slideInterval);
     };
-    document.getElementById('close').onclick = () => {
+
+    closeBtn.onclick = () => {
       overlay.classList.remove('open');
       overlay.setAttribute('aria-hidden', 'true');
+      restartSlides();
     };
+
     overlay.addEventListener('click', e => {
       if (e.target === overlay) {
         overlay.classList.remove('open');
         overlay.setAttribute('aria-hidden', 'true');
+        restartSlides();
       }
     });
+
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
         overlay.classList.remove('open');
         overlay.setAttribute('aria-hidden', 'true');
-        closeModal();
+        restartSlides();
       }
     });
 
-    function showSlide(i) {
-      document.querySelectorAll('.slide').forEach((s, n) => s.classList.toggle('active', n === i));
+    function restartSlides() {
+      const s = document.querySelectorAll('.slide');
+      if (!s.length) return;
+      let current = 0;
+      s[current].classList.add('active');
+      window.slideInterval = setInterval(() => {
+        s[current].classList.remove('active');
+        current = (current + 1) % s.length;
+        s[current].classList.add('active');
+      }, 7000);
     }
 
     function updateClock() {
@@ -394,7 +410,6 @@
       document.getElementById('clock').textContent = `${h}:${m}`;
     }
 
-    let current = 0;
     (async () => {
       updateDate();
       setInterval(updateDate, 60000);
@@ -405,12 +420,13 @@
       renderSlides(d);
       renderFloors(d);
       const s = document.querySelectorAll('.slide');
-      if (s.length) showSlide(0);
-      setInterval(() => {
-        if (!s.length) return;
+      if (s.length) s[0].classList.add('active');
+      window.slideInterval = setInterval(() => {
+        const active = document.querySelector('.slide.active');
+        const current = [...s].indexOf(active);
         s[current].classList.remove('active');
-        current = (current + 1) % s.length;
-        s[current].classList.add('active');
+        const next = (current + 1) % s.length;
+        s[next].classList.add('active');
       }, 7000);
       updateClock();
       setInterval(updateClock, 1000);
