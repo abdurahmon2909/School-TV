@@ -1,0 +1,10 @@
+{
+  "name": "school-display",
+  "version": "1.0.0",
+  "description": "Интерактивная школьная панель",
+  "main": "schoolTV.html",
+  "scripts": {
+    "start": "npx serve -s ."
+  },
+  "dependencies": {}
+}
