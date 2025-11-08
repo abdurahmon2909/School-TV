@@ -1,102 +1,141 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Интерактивная школа — заставка и карта</title>
-<style>
-:root{
---bg:#0f1724; --card:#0b1220; --accent:#06b6d4; --muted:#94a3b8; --glass: rgba(255,255,255,0.04);
---maxw:1200px;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,#071029 0%, #091426 100%);}
-.app{height:100vh;display:flex;align-items:center;justify-content:center}
-.screen{width:100%;height:100%;max-width:var(--maxw);margin:0 auto;position:relative;overflow:hidden;border-radius:6px}
-
-
-.slides{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.slide{min-width:100%;height:100%;padding:40px;display:flex;flex-direction:column;gap:20px;align-items:flex-start;justify-content:space-between;transition:transform .6s ease,opacity .6s ease}
-.slide-inner{background:var(--glass);backdrop-filter:blur(6px);border-radius:14px;padding:28px;width:calc(100% - 56px);height:calc(100% - 160px);display:flex;flex-direction:column;gap:18px}
-
-
-.header{display:flex;gap:18px;align-items:center}
-.logo{width:72px;height:72px;background:linear-gradient(135deg,var(--accent),#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#031124}
-.title{font-size:22px;font-weight:700}
-.subtitle{color:var(--muted);font-size:14px}
-
-
-.row{display:flex;gap:18px;flex-wrap:wrap}
-.card{background:rgba(255,255,255,0.02);padding:18px;border-radius:12px;min-width:220px;flex:1}
-.big{flex:2;min-width:320px}
-.name{font-size:20px;font-weight:700}
-.meta{color:var(--muted);font-size:13px;margin-top:6px}
-
-
-.footer{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.hint{pointer-events:auto;background:linear-gradient(90deg, rgba(6,182,212,0.12), rgba(124,58,237,0.08));padding:12px 22px;border-radius:999px;font-weight:600;color:var(--accent);backdrop-filter:blur(4px);box-shadow:0 6px 20px rgba(2,6,23,0.6)}
-
-
-.overlay{position:absolute;inset:0;background:linear-gradient(180deg, rgba(2,6,23,0.85), rgba(2,6,23,0.95));display:flex;flex-direction:column;padding:28px;gap:18px;transform:translateY(100%);transition:transform .4s ease}
-.overlay.open{transform:translateY(0)}
-.menu-top{display:flex;align-items:center;justify-content:space-between}
-.close-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted)}
-.floors{display:flex;flex-direction:column;gap:12px;overflow:auto;padding-right:6px}
-.floor-row{display:flex;gap:10px;align-items:stretch}
-.room{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:10px;min-width:160px;flex:1;cursor:pointer;transition:background .3s}
-.room:hover{background:rgba(255,255,255,0.06)}
-.room .r-title{font-weight:700}
-.room .r-sub{color:var(--muted);font-size:13px;margin-top:6px}
-
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .3s ease, visibility .3s ease;z-index:50}
-.modal.show{visibility:visible;opacity:1}
-.modal-content{background:var(--card);border-radius:14px;padding:24px;max-width:400px;width:90%;text-align:center}
-.modal-content h3{margin:0;font-size:20px;margin-bottom:8px}
-.modal-content p{margin:6px 0;color:var(--muted)}
-.modal-content button{margin-top:18px;padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
-
-
-@media (max-width:800px){
-.slide-inner{padding:18px}
-.logo{width:56px;height:56px}
-.title{font-size:18px}
-.card{min-width:180px}
-.room{min-width:140px}
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Интерактивная школа</title>
+  <style>
+    :root {
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #06b6d4;
+      --muted: #94a3b8;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071029 0%,#091426 100%);color:#e6eef6}
+    .screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    .slides{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .5s ease}
+    .slide{min-width:100%;height:100%;padding:40px;display:flex;flex-direction:column;justify-content:space-between}
+    .slide-inner{background:var(--glass);backdrop-filter:blur(6px);border-radius:16px;padding:30px;display:flex;flex-direction:column;gap:20px;height:calc(100% - 120px)}
+    .title{font-size:28px;font-weight:700}
+    .card{background:rgba(255,255,255,0.05);padding:16px;border-radius:10px;margin-top:8px}
+    .footer{position:absolute;bottom:20px;width:100%;text-align:center}
+    .hint{display:inline-block;padding:10px 22px;background:linear-gradient(90deg,rgba(6,182,212,0.2),rgba(124,58,237,0.2));border-radius:999px;color:var(--accent);font-weight:600;backdrop-filter:blur(6px)}
+    .overlay{position:absolute;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);transform:translateY(100%);transition:transform .4s ease;display:flex;flex-direction:column;padding:20px;overflow:auto}
+    .overlay.open{transform:translateY(0)}
+    .floor{margin-bottom:20px}
+    .floor h2{margin-bottom:10px}
+    .rooms{display:flex;gap:10px;flex-wrap:wrap}
+    .room{background:rgba(255,255,255,0.1);padding:10px 14px;border-radius:8px;cursor:pointer}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center}
+    .modal.show{display:flex}
+    .modal-content{background:#111a2b;padding:24px;border-radius:12px;text-align:center}
+    .modal-content h3{margin-bottom:10px}
+    .modal-content button{margin-top:14px;padding:8px 16px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer}
+  </style>
 </head>
 <body>
-<div class="app">
-<div class="screen" id="screen">
-<div class="slides" id="slides"></div>
-<div class="footer"><div class="hint" id="hint">menyuga kirish uchun ekranga bosing</div></div>
-<div class="overlay" id="overlay" aria-hidden="true">
-<div class="menu-top">
-<div>
-<div style="font-weight:800;font-size:18px">Схема школы — 4 этажа</div>
-<div style="color:var(--muted);font-size:13px;margin-top:4px">Нажмите комнату, чтобы увидеть подробности</div>
-</div>
-<button class="close-btn" id="closeMenu">Закрыть</button>
-</div>
-<div class="floors" id="floors"></div>
-</div>
-<div class="modal" id="modal">
-<div class="modal-content" id="modalContent"></div>
-</div>
-</div>
-</div>
+  <div class="screen">
+    <div class="slides" id="slides"></div>
+    <div class="footer"><div class="hint" id="hint">menyuga kirish uchun ekranga bosing</div></div>
 
+    <div class="overlay" id="overlay">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h2>🏫 Схема школы</h2>
+        <button id="close" style="background:var(--accent);border:none;border-radius:8px;padding:6px 12px;color:#fff;cursor:pointer">Закрыть</button>
+      </div>
+      <div id="floors"></div>
+    </div>
 
-<script>
-const SHEET_ID = '1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA'; // Вставьте сюда ID Google Sheet
-const API_KEY = 'AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM'; // Google API Key
-const RANGE = 'Лист1!A1:E100';
+    <div class="modal" id="modal">
+      <div class="modal-content" id="modal-content"></div>
+    </div>
+  </div>
 
+  <script>
+    async function loadData() {
+      const res = await fetch('data.json');
+      return await res.json();
+    }
 
-async function loadData() {
-const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`);
-</html>http://localhost:8000/index.html
+    function renderSlides(DATA){
+      const slides = document.getElementById('slides');
+      slides.innerHTML = '';
 
+      slides.appendChild(makeSlide('Лучший ученик недели', `
+        <div class="card">
+          <div><b>${DATA.best_student_week.name}</b> (${DATA.best_student_week.class})</div>
+          <div>Средний балл: ${DATA.best_student_week.score}</div>
+        </div>`));
 
+      slides.appendChild(makeSlide('Лучший класс недели', `
+        <div class="card">
+          <div><b>${DATA.best_class_week.class}</b></div>
+          <div>Средний балл: ${DATA.best_class_week.avg}</div>
+        </div>`));
 
+      slides.appendChild(makeSlide('Недавние события', 
+        DATA.recent_events.map(e=>`<div class="card"><b>${e.title}</b><div>${e.date}</div></div>`).join('')
+      ));
+
+      slides.appendChild(makeSlide('Лучшие классы за квартал', 
+        DATA.top_classes_quarter.map(c=>`<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join('')
+      ));
+    }
+
+    function makeSlide(title,content){
+      const s=document.createElement('div');
+      s.className='slide';
+      s.innerHTML=`<div class="slide-inner"><div class="title">${title}</div>${content}</div>`;
+      return s;
+    }
+
+    function showSlide(i){
+      const slides=document.querySelectorAll('.slide');
+      slides.forEach((el,idx)=>{el.style.transform=`translateX(${(idx-i)*100}%)`;});
+    }
+
+    function renderFloors(DATA){
+      const floors=document.getElementById('floors');
+      floors.innerHTML='';
+      DATA.floors.sort((a,b)=>b.floor-a.floor).forEach(f=>{
+        const div=document.createElement('div');
+        div.className='floor';
+        div.innerHTML=`<h2>Этаж ${f.floor}</h2>`;
+        const rooms=document.createElement('div');
+        rooms.className='rooms';
+        f.rooms.forEach(r=>{
+          const card=document.createElement('div');
+          card.className='room';
+          card.textContent=`${r.room} — ${r.class}`;
+          card.onclick=()=>showModal(r);
+          rooms.appendChild(card);
+        });
+        div.appendChild(rooms);
+        floors.appendChild(div);
+      });
+    }
+
+    function showModal(r){
+      const modal=document.getElementById('modal');
+      const cont=document.getElementById('modal-content');
+      cont.innerHTML=`<h3>${r.room} — ${r.class}</h3><p>${r.subject}</p><p>Учитель: ${r.teacher}</p><button onclick="closeModal()">Закрыть</button>`;
+      modal.classList.add('show');
+    }
+
+    function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+    document.getElementById('hint').onclick=()=>document.getElementById('overlay').classList.add('open');
+    document.getElementById('close').onclick=()=>document.getElementById('overlay').classList.remove('open');
+
+    (async ()=>{
+      const DATA=await loadData();
+      renderSlides(DATA);
+      renderFloors(DATA);
+      showSlide(0);
+      let i=0;setInterval(()=>{i=(i+1)%document.querySelectorAll('.slide').length;showSlide(i);},5000);
+    })();
+  </script>
+</body>
+</html>
