@@ -241,18 +241,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const hint = document.getElementById('hint');
   const closeBtn = document.getElementById('close');
 
-  function restartSlides() {
-    const s = document.querySelectorAll('.slide');
-    if (!s.length) return;
-    let current = 0;
-    s[current].classList.add('active');
-    window.slideInterval = setInterval(() => {
-      s[current].classList.remove('active');
-      current = (current + 1) % s.length;
-      s[current].classList.add('active');
-    }, 7000);
-  }
-
+  // Безопасное подключение событий
   if (hint) {
     hint.addEventListener('click', () => {
       overlay.classList.add('open');
@@ -285,6 +274,19 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  function restartSlides() {
+    const s = document.querySelectorAll('.slide');
+    if (!s.length) return;
+    let current = 0;
+    s[current].classList.add('active');
+    window.slideInterval = setInterval(() => {
+      s[current].classList.remove('active');
+      current = (current + 1) % s.length;
+      s[current].classList.add('active');
+    }, 7000);
+  }
+
+  // Всё, что было раньше:
   const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
   const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
   const RANGE_MAIN = "Лист1!A1:M100";
@@ -296,6 +298,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     const m = n.getMinutes().toString().padStart(2, '0');
     document.getElementById('clock').textContent = `${h}:${m}`;
   }
+
   updateClock();
   setInterval(updateClock, 1000);
 
@@ -307,10 +310,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     return r.map(x => Object.fromEntries(h.map((k, i) => [k, x[i]])));
   }
 
+  // Загружаем данные после загрузки DOM
   const mainRows = await loadSheet(RANGE_MAIN);
   const scheduleRows = await loadSheet(RANGE_SCHEDULE);
   console.log("Sheets loaded:", mainRows.length, scheduleRows.length);
 });
-  </script>
-</body>
-</html>
+</script>
