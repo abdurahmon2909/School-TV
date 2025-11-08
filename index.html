@@ -292,7 +292,7 @@
           <div style="margin-top:10px;font-size:1.3em;">Bahosi: ${d.best_student_week?.score||"-"}</div>
         </div>`));
       slides.appendChild(makeSlide('🏫 Haftaning eng yaxshi sinfi',`<div class="card"><b>${d.best_class_week?.class||"-"}</b><br>O‘rtacha baho: ${d.best_class_week?.avg||"-"}</div>`));
-      slides.appendChild(makeSlide('🏆 Chorakdagi eng yaxshi sinflar',d.top_classes_quarter.length?d.top_classes_quarter.map(c=>`<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join(''):'<div class="card">Ma\'lumot yo‘q</div>`));
+      slides.appendChild(makeSlide('🏆 Chorakdagi eng yaxshi sinflar',d.top_classes_quarter.length?d.top_classes_quarter.map(c=>`<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join(''):'<div class="card">Ma`lumot yo‘q</div>`));
     }
 
     function renderFloors(d){
@@ -365,3 +365,4 @@
   </script>
 </body>
 </html>
+
