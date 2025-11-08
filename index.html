@@ -1,65 +1,73 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maktab Axborot Paneli</title>
   <style>
     :root {
-      --bg:#081121;
-      --accent:#00c4ff;
-      --card-bg:rgba(255,255,255,0.08);
-      --text:#f0f8ff;
+      --bg: #081121;
+      --accent: #00c4ff;
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --text: #f0f8ff;
     }
-    * {margin:0;padding:0;box-sizing:border-box}
-    html,body {
-      height:100%;
-      font-family:"Inter","Poppins",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      overflow:hidden;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      font-family: "Inter", "Poppins", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
     }
     .screen {
-      width:100%;height:100%;
-      display:flex;align-items:center;justify-content:center;
-      position:relative;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
     }
     .header {
-      position:absolute;top:18px;left:0;width:100%;
-      text-align:center;color:var(--accent);
-      font-size:36px;font-weight:700;
-      text-shadow:0 0 15px rgba(0,196,255,0.6);
-      display:flex;flex-direction:column;align-items:center;
-      justify-content:center;line-height:1.3;
+      position: absolute; top: 18px; left: 0; width: 100%;
+      text-align: center; color: var(--accent);
+      font-size: 36px; font-weight: 700;
+      text-shadow: 0 0 15px rgba(0,196,255,0.6);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; line-height: 1.3;
     }
-    .date-line {font-size:22px;color:#a9e6ff;font-weight:500;text-shadow:0 0 10px rgba(0,196,255,0.3);}
-    #clock {position:absolute;top:24px;right:40px;font-size:34px;font-weight:600;color:var(--accent);text-shadow:0 0 12px rgba(0,196,255,0.4);}
-    .slides {position:absolute;inset:0;display:flex;justify-content:center;align-items:center;}
-    .slide {position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1s ease-in-out;}
-    .slide.active {opacity:1;z-index:2;}
-    .slide-inner {background:var(--card-bg);padding:40px;border-radius:24px;backdrop-filter:blur(8px);width:80%;max-width:900px;text-align:center;}
-    h1 {font-size:44px;margin-bottom:20px;color:var(--accent);}
-    .card {background:rgba(255,255,255,0.05);padding:20px 30px;border-radius:16px;margin:10px 0;font-size:26px;}
-    .footer {position:absolute;bottom:40px;width:100%;text-align:center;}
-    .hint {display:inline-block;padding:16px 40px;background:linear-gradient(90deg,rgba(0,196,255,0.3),rgba(180,58,255,0.3));border-radius:999px;font-weight:600;color:var(--accent);cursor:pointer;font-size:26px;backdrop-filter:blur(8px);box-shadow:0 0 20px rgba(0,196,255,0.3);}
-    .overlay {position:absolute;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);transform:translateY(100%);transition:transform 0.35s ease;padding:30px;overflow-y:auto;font-size:20px;}
-    .overlay.open {transform:translateY(0);}
-    .menu-top {display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-    .menu-title {font-size:28px;font-weight:700;color:var(--accent);text-shadow:0 0 10px rgba(0,196,255,0.5);}
-    .menu-close {background:var(--accent);border:none;border-radius:10px;padding:8px 14px;color:#fff;cursor:pointer;font-size:18px;}
-    .floors {display:block;}
-    .floor {margin-bottom:26px;}
-    .floor h2 {color:var(--accent);margin-bottom:12px;font-size:24px;}
-    .rooms {display:flex;flex-wrap:wrap;gap:14px;}
-    .room {background:var(--card-bg);padding:14px;border-radius:12px;min-width:280px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:0.14s;}
-    .room:hover {transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,0.4);}
-    .room img {width:90px;height:90px;border-radius:10px;object-fit:cover;border:2px solid var(--accent);}
-    .modal {position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);}
-    .modal.show {display:flex;}
-    .modal-content {background:#111a2b;padding:22px;border-radius:12px;text-align:center;width:420px;max-width:90%;}
-    .modal-content img {width:160px;height:160px;border-radius:10px;object-fit:cover;border:3px solid var(--accent);margin-bottom:12px;}
-    .modal-close {margin-top:12px;padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;}
-    .muted {color:#9fb0c0;font-size:18px;}
+    .date-line {
+      font-size: 22px; color: #a9e6ff;
+      font-weight: 500; text-shadow: 0 0 10px rgba(0,196,255,0.3);
+    }
+    #clock {
+      position: absolute; top: 24px; right: 40px;
+      font-size: 34px; font-weight: 600;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(0,196,255,0.4);
+    }
+    .slides { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; }
+    .slide { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 1s ease-in-out; }
+    .slide.active { opacity: 1; z-index: 2; }
+    .slide-inner { background: var(--card-bg); padding: 40px; border-radius: 24px; backdrop-filter: blur(8px); width: 80%; max-width: 900px; text-align: center; }
+    h1 { font-size: 44px; margin-bottom: 20px; color: var(--accent); }
+    .card { background: rgba(255,255,255,0.05); padding: 20px 30px; border-radius: 16px; margin: 10px 0; font-size: 26px; }
+    .footer { position: absolute; bottom: 40px; width: 100%; text-align: center; }
+    .hint { display: inline-block; padding: 16px 40px; background: linear-gradient(90deg, rgba(0,196,255,0.3), rgba(180,58,255,0.3)); border-radius: 999px; font-weight: 600; color: var(--accent); cursor: pointer; font-size: 26px; backdrop-filter: blur(8px); box-shadow: 0 0 20px rgba(0,196,255,0.3); }
+    .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); transform: translateY(100%); transition: transform 0.35s ease; padding: 30px; overflow-y: auto; font-size: 20px; }
+    .overlay.open { transform: translateY(0); }
+    .menu-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .menu-title { font-size: 28px; font-weight: 700; color: var(--accent); text-shadow: 0 0 10px rgba(0,196,255,0.5); }
+    .menu-close { background: var(--accent); border: none; border-radius: 10px; padding: 8px 14px; color: #fff; cursor: pointer; font-size: 18px; }
+    .floors { display: block; }
+    .floor { margin-bottom: 26px; }
+    .floor h2 { color: var(--accent); margin-bottom: 12px; font-size: 24px; }
+    .rooms { display: flex; flex-wrap: wrap; gap: 14px; }
+    .room { background: var(--card-bg); padding: 14px; border-radius: 12px; min-width: 280px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: 0.14s; }
+    .room:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .room img { width: 90px; height: 90px; border-radius: 10px; object-fit: cover; border: 2px solid var(--accent); }
+    .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); }
+    .modal.show { display: flex; }
+    .modal-content { background: #111a2b; padding: 22px; border-radius: 12px; text-align: center; width: 420px; max-width: 90%; }
+    .modal-content img { width: 160px; height: 160px; border-radius: 10px; object-fit: cover; border: 3px solid var(--accent); margin-bottom: 12px; }
+    .modal-close { margin-top: 12px; padding: 8px 14px; background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+    .muted { color: #9fb0c0; font-size: 18px; }
   </style>
 </head>
 <body>
@@ -68,11 +76,8 @@
       🏫 №15 Umumta’lim maktabi
       <div class="date-line" id="date-line">📅 Yuklanmoqda...</div>
     </div>
-
     <div id="clock"></div>
-
     <div class="slides" id="slides"></div>
-
     <div class="footer">
       <div class="hint" id="hint">🏠 Bosh sahifa</div>
     </div>
@@ -91,198 +96,139 @@
   </div>
 
   <script>
-    const SHEET_ID="1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
-    const API_KEY="AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
-    const RANGE_MAIN="Лист1!A1:M100";
-    const RANGE_SCHEDULE="schedule!A1:H100";
+const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
+const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
+const RANGE_MAIN = "Лист1!A1:M100";
+const RANGE_SCHEDULE = "schedule!A1:H100";
 
-    // ✅ fallback SVG image (embedded)
-    const FALLBACK_IMG="data:image/svg+xml;utf8,"+encodeURIComponent(
-      `<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'>
-        <rect width='100%' height='100%' fill='#2b323a'/>
-        <text x='50%' y='50%' fill='#9fb0c0' font-family='Arial' font-size='18' text-anchor='middle' dy='.3em'>No Image</text>
-      </svg>`
-    );
+// встроенное fallback изображение (SVG)
+const FALLBACK_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%' height='100%' fill='#2b323a'/><text x='50%' y='50%' fill='#9fb0c0' font-size='16' font-family='Arial' text-anchor='middle' dy='.3em'>No Img</text></svg>"
+);
 
-    const oylar=["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentyabr","oktyabr","noyabr","dekabr"];
-    const kunlar=["yakshanba","dushanba","seshanba","chorshanba","payshanba","juma","shanba"];
-    function updateDate(){
-      const n=new Date();
-      document.getElementById("date-line").textContent=`📅 ${n.getDate()}-${oylar[n.getMonth()]} ${n.getFullYear()}-yil, ${kunlar[n.getDay()]}`;
-    }
-    function updateClock(){
-      const n=new Date();
-      document.getElementById("clock").textContent=n.getHours().toString().padStart(2,"0")+":"+n.getMinutes().toString().padStart(2,"0");
-    }
+const oylar = ["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentyabr","oktyabr","noyabr","dekabr"];
+const kunlar = ["yakshanba","dushanba","seshanba","chorshanba","payshanba","juma","shanba"];
 
-    async function loadSheet(range){
-      const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-      try{
-        const res=await fetch(url);
-        if(!res.ok){console.error("Google Sheets error:",res.status,res.statusText);return[];}
-        const j=await res.json();
-        if(!j.values||!j.values.length){console.warn("Empty sheet:",range);return[];}
-        const[h,...r]=j.values;
-        return r.map(x=>Object.fromEntries(h.map((k,i)=>[k,x[i]||""])));
-      }catch(e){console.error("Fetch error:",range,e);return[];}
-    }
+function updateDate() {
+  const n = new Date();
+  document.getElementById("date-line").textContent = `📅 ${n.getDate()}-${oylar[n.getMonth()]} ${n.getFullYear()}-yil, ${kunlar[n.getDay()]}`;
+}
+function updateClock() {
+  const n = new Date();
+  document.getElementById("clock").textContent = n.getHours().toString().padStart(2,"0") + ":" + n.getMinutes().toString().padStart(2,"0");
+}
 
-    function parseData(rows){
-      return{
-        best_student_week:rows.find(r=>r.type==="best_student_week")||{},
-        best_class_week:rows.find(r=>r.type==="best_class_week")||{},
-        recent_events:rows.filter(r=>r.type==="recent_event"),
-        top_classes_quarter:rows.filter(r=>r.type==="top_class_quarter"),
-        schedule:rows.filter(r=>r.type==="schedule"),
-        floors:Object.values(rows.filter(r=>r.type==="room_info").reduce((a,r)=>{
-          const f=r.floor||"0";if(!a[f])a[f]={floor:f,rooms:[]};a[f].rooms.push(r);return a;
-        },{}))
-      };
-    }
+async function loadSheet(range) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const j = await res.json();
+    if (!j.values || !j.values.length) return [];
+    const [h,...r] = j.values;
+    return r.map(x => Object.fromEntries(h.map((k,i)=>[k,x[i]||""])));
+  } catch { return []; }
+}
 
-    function makeSlide(title,content){
-      const s=document.createElement("div");
-      s.className="slide";
-      s.innerHTML=`<div class='slide-inner'><h1>${title}</h1>${content}</div>`;
-      return s;
-    }
+function parseData(rows) {
+  return {
+    best_student_week: rows.find(r => r.type === "best_student_week") || {},
+    best_class_week: rows.find(r => r.type === "best_class_week") || {},
+    recent_events: rows.filter(r => r.type === "recent_event"),
+    top_classes_quarter: rows.filter(r => r.type === "top_class_quarter"),
+    floors: Object.values(rows.filter(r => r.type === "room_info").reduce((a,r)=>{
+      const f = r.floor || "0";
+      if (!a[f]) a[f] = {floor:f,rooms:[]};
+      a[f].rooms.push(r);
+      return a;
+    }, {}))
+  };
+}
 
-    function renderSlides(d){
-      const slides=document.getElementById("slides");
-      slides.innerHTML="";
+function makeSlide(title, content) {
+  const s = document.createElement("div");
+  s.className = "slide";
+  s.innerHTML = `<div class='slide-inner'><h1>${title}</h1>${content}</div>`;
+  return s;
+}
 
-      slides.appendChild(makeSlide("📰 So‘nggi voqеalar",
-        d.recent_events.length?
-        d.recent_events.map(e=>`<div class='card'><b>${e.title||""}</b><div class='muted'>${e.date||""}</div></div>`).join(""):
-        "<div class='card'>Hech qanday voqea yo‘q</div>"
-      ));
+function renderSlides(d) {
+  const slides = document.getElementById("slides");
+  slides.innerHTML = "";
+  slides.appendChild(makeSlide("📰 So‘nggi voqеалар",
+    d.recent_events.length ? d.recent_events.map(e=>`<div class='card'><b>${e.title||""}</b><div class='muted'>${e.date||""}</div></div>`).join("") : "<div class='card'>Hech qanday voqea yo‘q</div>"
+  ));
+  slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi", `
+    <div class='card' style='display:flex;flex-direction:column;align-items:center;'>
+      <img src='${(d.best_student_week.student_img && d.best_student_week.student_img.startsWith("http")) ? d.best_student_week.student_img : FALLBACK_IMG}'
+           onerror="this.src='${FALLBACK_IMG}'"
+           style='width:240px;height:240px;object-fit:cover;border-radius:12px;margin-bottom:18px;border:4px solid var(--accent);'>
+      <b style='font-size:1.6em;'>${d.best_student_week.name||"—"}</b>
+      <div style='font-size:1.2em;color:#9fdfff'>${d.best_student_week.class||""}</div>
+      <div style='margin-top:10px;font-size:1.1em;'>Bahosi: ${d.best_student_week.score||"-"}</div>
+    </div>`));
+}
 
-      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi",`
-        <div class='card' style='display:flex;flex-direction:column;align-items:center;'>
-          <img src='${(d.best_student_week.student_img&&d.best_student_week.student_img.startsWith("http"))?d.best_student_week.student_img:FALLBACK_IMG}'
-               onerror="this.onerror=null;this.src='${FALLBACK_IMG}'"
-               style='width:240px;height:240px;object-fit:cover;border-radius:12px;margin-bottom:18px;border:4px solid var(--accent);'>
-          <b style='font-size:1.6em;'>${d.best_student_week.name||"—"}</b>
-          <div style='font-size:1.2em;color:#9fdfff'>${d.best_student_week.class||""}</div>
-          <div style='margin-top:10px;font-size:1.1em;'>Bahosi: ${d.best_student_week.score||"-"}</div>
-        </div>`));
-
-      slides.appendChild(makeSlide("🏫 Haftaning eng yaxshi sinfi",
-        `<div class='card'><b>${d.best_class_week.class||"-"}</b><br>O‘rtacha baho: ${d.best_class_week.avg||"-"}</div>`
-      ));
-
-      slides.appendChild(makeSlide("🏆 Chorakdagi eng yaxshi sinflar",
-        d.top_classes_quarter.length?
-        d.top_classes_quarter.map(c=>`<div class='card'><b>${c.class||""}</b> — ${c.avg||""}</div>`).join(""):
-        "<div class='card'>Ma'lumot yo‘q</div>"
-      ));
-    }
-
-    function renderFloors(d){
-      const cont=document.getElementById("floors");
-      cont.innerHTML="";
-      d.floors.sort((a,b)=>Number(b.floor)-Number(a.floor));
-      d.floors.forEach(f=>{
-        const div=document.createElement("div");
-        div.className="floor";
-        div.innerHTML=`<h2>${f.floor}-qavat</h2>`;
-        const rooms=document.createElement("div");
-        rooms.className="rooms";
-        f.rooms.forEach(r=>{
-          const img=r.teacher_img&&r.teacher_img.startsWith("http")?r.teacher_img:FALLBACK_IMG;
-          const el=document.createElement("div");
-          el.className="room";
-          el.innerHTML=`
-            <img src='${img}' onerror="this.onerror=null;this.src='${FALLBACK_IMG}'" alt='teacher'>
-            <div><div style='font-weight:700'>${r.room||""} — ${r.class||""}</div>
-                 <div style='color:#9fb0c0'>${r.subject||""}</div>
-                 <div style='font-size:14px;color:#9fb0c0'>${r.teacher||""}</div></div>`;
-          el.addEventListener("click",()=>showModal(r));
-          rooms.appendChild(el);
-        });
-        div.appendChild(rooms);
-        cont.appendChild(div);
-      });
-    }
-
-    function showModal(r){
-      const m=document.getElementById("modal");
-      const c=document.getElementById("modal-content");
-      const img=r.teacher_img&&r.teacher_img.startsWith("http")?r.teacher_img:FALLBACK_IMG;
-      c.innerHTML=`
-        <img src='${img}' onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
-        <h3>${r.room||""} — ${r.class||""}</h3>
-        <p style='color:var(--accent)'>${r.subject||""}</p>
-        <p>O‘qituvchi: <b>${r.teacher||"—"}</b></p>
-        <button class='modal-close' onclick="document.getElementById('modal').classList.remove('show')">Yopish</button>`;
-      m.classList.add("show");
-    }
-
-    function restartSlides(){
-      const s=document.querySelectorAll(".slide");
-      if(!s.length)return;
-      if(window.slideInterval)clearInterval(window.slideInterval);
-      s.forEach(e=>e.classList.remove("active"));
-      s[0].classList.add("active");
-      let i=0;
-      window.slideInterval=setInterval(()=>{
-        s[i].classList.remove("active");
-        i=(i+1)%s.length;
-        s[i].classList.add("active");
-      },5000);
-    }
-
-    window.addEventListener("DOMContentLoaded",async()=>{
-      const overlay=document.getElementById("overlay");
-      const hint=document.getElementById("hint");
-      const close=document.getElementById("close");
-
-      hint.addEventListener("click",()=>{
-        overlay.classList.add("open");
-        overlay.setAttribute("aria-hidden","false");
-        clearInterval(window.slideInterval);
-      });
-      close.addEventListener("click",()=>{
-        overlay.classList.remove("open");
-        overlay.setAttribute("aria-hidden","true");
-        restartSlides();
-      });
-      overlay.addEventListener("click",e=>{
-        if(e.target===overlay){
-          overlay.classList.remove("open");
-          overlay.setAttribute("aria-hidden","true");
-          restartSlides();
-        }
-      });
-      document.addEventListener("keydown",e=>{
-        if(e.key==="Escape"){
-          overlay.classList.remove("open");
-          overlay.setAttribute("aria-hidden","true");
-          restartSlides();
-        }
-      });
-
-      updateDate();updateClock();
-      setInterval(updateDate,60000);
-      setInterval(updateClock,1000);
-
-      document.getElementById("date-line").textContent="📅 Ma'lumot yuklanmoqda...";
-      const main=await loadSheet(RANGE_MAIN);
-      const sched=await loadSheet(RANGE_SCHEDULE);
-
-      if(!main.length&&!sched.length){
-        document.getElementById("date-line").textContent="⚠️ Ma'lumot topilmadi (Google Sheets)";
-        renderSlides({recent_events:[],top_classes_quarter:[],best_student_week:{},best_class_week:{},floors:[]});
-        return;
-      }
-
-      const DATA=parseData([...main,...sched]);
-      renderSlides(DATA);
-      renderFloors(DATA);
-      restartSlides();
-      document.getElementById("date-line").textContent="✅ Ma'lumot yuklandi";
-      console.log("Sheets loaded:",main.length,sched.length);
+function renderFloors(d) {
+  const cont = document.getElementById("floors");
+  cont.innerHTML = "";
+  d.floors.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "floor";
+    div.innerHTML = `<h2>${f.floor}-qavat</h2>`;
+    const rooms = document.createElement("div");
+    rooms.className = "rooms";
+    f.rooms.forEach(r => {
+      const img = (r.teacher_img && r.teacher_img.startsWith("http")) ? r.teacher_img : FALLBACK_IMG;
+      const el = document.createElement("div");
+      el.className = "room";
+      el.innerHTML = `
+        <img src='${img}' onerror="this.src='${FALLBACK_IMG}'" alt='teacher'>
+        <div>
+          <div style='font-weight:700'>${r.room||""} — ${r.class||""}</div>
+          <div style='color:#9fb0c0'>${r.subject||""}</div>
+          <div style='font-size:14px;color:#9fb0c0'>${r.teacher||""}</div>
+        </div>`;
+      rooms.appendChild(el);
     });
+    div.appendChild(rooms);
+    cont.appendChild(div);
+  });
+}
+
+function restartSlides() {
+  const s = document.querySelectorAll(".slide");
+  if (!s.length) return;
+  s.forEach(e=>e.classList.remove("active"));
+  let i = 0;
+  s[i].classList.add("active");
+  clearInterval(window.slideInterval);
+  window.slideInterval = setInterval(()=>{
+    s[i].classList.remove("active");
+    i = (i + 1) % s.length;
+    s[i].classList.add("active");
+  }, 5000);
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  const overlay = document.getElementById("overlay");
+  const hint = document.getElementById("hint");
+  const close = document.getElementById("close");
+
+  hint.addEventListener("click", ()=>{overlay.classList.add("open"); clearInterval(window.slideInterval);});
+  close.addEventListener("click", ()=>{overlay.classList.remove("open"); restartSlides();});
+
+  updateDate(); updateClock();
+  setInterval(updateDate, 60000);
+  setInterval(updateClock, 1000);
+
+  const main = await loadSheet(RANGE_MAIN);
+  const schedule = await loadSheet(RANGE_SCHEDULE);
+  const DATA = parseData([...main, ...schedule]);
+  renderSlides(DATA);
+  renderFloors(DATA);
+  restartSlides();
+});
   </script>
 </body>
 </html>
