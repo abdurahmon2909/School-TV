@@ -91,11 +91,12 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helv
 <script>
 const SHEET_ID = '1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA'; // Вставьте сюда ID Google Sheet
 const API_KEY = 'AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM'; // Google API Key
-const RANGE = 'SchoolTVData!A1:E100';
+const RANGE = 'Лист1!A1:E100';
 
 
 async function loadData() {
 const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`);
 </html>http://localhost:8000/index.html
+
 
 
