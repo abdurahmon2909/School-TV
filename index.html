@@ -29,7 +29,6 @@
       position: relative;
     }
 
-    /* Header */
     .header {
       position: absolute;
       top: 18px;
@@ -65,7 +64,6 @@
       text-shadow: 0 0 12px rgba(0,196,255,0.4);
     }
 
-    /* Slides */
     .slides {
       position: absolute;
       inset: 0;
@@ -85,10 +83,7 @@
       transition: opacity 1.5s ease-in-out;
     }
 
-    .slide.active {
-      opacity: 1;
-      z-index: 2;
-    }
+    .slide.active { opacity: 1; z-index: 2; }
 
     .slide-inner {
       background: var(--card-bg);
@@ -120,7 +115,6 @@
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    /* Footer button */
     .footer {
       position: absolute;
       bottom: 40px;
@@ -141,7 +135,6 @@
       box-shadow: 0 0 20px rgba(0,196,255,0.3);
     }
 
-    /* Overlay (menu) */
     .overlay {
       position: absolute;
       inset: 0;
@@ -204,7 +197,6 @@
       border: 2px solid var(--accent);
     }
 
-    /* Modal */
     .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); }
     .modal.show { display: flex; }
     .modal-content { background: #111a2b; padding: 22px; border-radius: 12px; text-align: center; width: 420px; max-width: 90%; }
@@ -245,7 +237,7 @@
     const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
     const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
     const RANGE_MAIN = "Лист1!A1:M100";
-    const RANGE_SCHEDULE = "Schedule!A1:H100";
+    const RANGE_SCHEDULE = "schedule!A1:H100";
 
     const oylar = ["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentyabr","oktyabr","noyabr","dekabr"];
     const kunlar = ["yakshanba","dushanba","seshanba","chorshanba","payshanba","juma","shanba"];
@@ -259,114 +251,170 @@
       document.getElementById("date-line").textContent = `📅 ${day}-${month} ${year}-yil, ${weekday}`;
     }
 
-    async function loadSheet(range){
-      const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-      const res=await fetch(url);const j=await res.json();
-      const[h,...r]=j.values||[[]];
-      return r.map(x=>Object.fromEntries(h.map((k,i)=>[k,x[i]])));
+    async function loadSheet(range) {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+      const res = await fetch(url);
+      const j = await res.json();
+      const [h, ...r] = j.values || [[]];
+      return r.map(x => Object.fromEntries(h.map((k, i) => [k, x[i]])));
     }
 
-    function parseData(rows){
+    function parseData(rows) {
       return {
-        best_student_week: rows.find(r=>r.type==="best_student_week"),
-        best_class_week: rows.find(r=>r.type==="best_class_week"),
-        recent_events: rows.filter(r=>r.type==="recent_event"),
-        top_classes_quarter: rows.filter(r=>r.type==="top_class_quarter"),
-        schedule: rows.filter(r=>r.type==="schedule"),
-        floors:Object.values(rows.filter(r=>r.type==="room_info").reduce((a,r)=>{
-          const f=r.floor||'0';if(!a[f])a[f]={floor:f,rooms:[]};a[f].rooms.push(r);return a;},{}))
+        best_student_week: rows.find(r => r.type === "best_student_week"),
+        best_class_week: rows.find(r => r.type === "best_class_week"),
+        recent_events: rows.filter(r => r.type === "recent_event"),
+        top_classes_quarter: rows.filter(r => r.type === "top_class_quarter"),
+        schedule: rows.filter(r => r.type === "schedule"),
+        floors: Object.values(rows.filter(r => r.type === "room_info").reduce((a, r) => {
+          const f = r.floor || '0';
+          if (!a[f]) a[f] = { floor: f, rooms: [] };
+          a[f].rooms.push(r);
+          return a;
+        }, {}))
       };
     }
 
-    function makeSlide(t,c){const s=document.createElement('div');s.className='slide';s.innerHTML=`<div class="slide-inner"><h1>${t}</h1>${c}</div>`;return s;}
+    function makeSlide(t, c) {
+      const s = document.createElement('div');
+      s.className = 'slide';
+      s.innerHTML = `<div class="slide-inner"><h1>${t}</h1>${c}</div>`;
+      return s;
+    }
 
-    function renderSlides(d){
-      const slides=document.getElementById('slides');slides.innerHTML='';
-      slides.appendChild(makeSlide('📰 So‘nggi voqealar',d.recent_events.length?d.recent_events.map(e=>`<div class="card"><b>${e.title}</b><div class="muted">${e.date||''}</div></div>`).join(''):'<div class="card">Hech qanday voqea yo‘q</div>'));
-      slides.appendChild(makeSlide('🎓 Haftaning eng yaxshi o‘quvchisi',`
+    function renderSlides(d) {
+      const slides = document.getElementById('slides');
+      slides.innerHTML = '';
+
+      slides.appendChild(makeSlide('📰 So‘nggi voqealar',
+        d.recent_events.length
+          ? d.recent_events.map(e => `<div class="card"><b>${e.title}</b><div class="muted">${e.date || ''}</div></div>`).join('')
+          : '<div class="card">Hech qanday voqea yo‘q</div>'
+      ));
+
+      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o'quvchisi", `
         <div class="card" style="display:flex;flex-direction:column;align-items:center;">
-          <img src="${(d.best_student_week&&d.best_student_week.student_img&&d.best_student_week.student_img.includes('http'))?d.best_student_week.student_img:'https://i.imgur.com/xO5T4.gif'}"
+          <img src="${(d.best_student_week && d.best_student_week.student_img && d.best_student_week.student_img.includes('http')) ? d.best_student_week.student_img : 'https://i.imgur.com/xO5T4.gif'}"
           style="width:240px;height:240px;object-fit:cover;border-radius:10px;margin-bottom:20px;border:4px solid var(--accent);box-shadow:0 0 20px rgba(0,196,255,0.3);animation:zoomIn 1.5s ease;" alt="O‘quvchi rasmi">
-          <b style="font-size:1.8em;">${d.best_student_week?.name||"—"}</b>
-          <div style="font-size:1.4em;color:#9fdfff;">${d.best_student_week?.class||""}</div>
-          <div style="margin-top:10px;font-size:1.3em;">Bahosi: ${d.best_student_week?.score||"-"}</div>
+          <b style="font-size:1.8em;">${d.best_student_week?.name || "—"}</b>
+          <div style="font-size:1.4em;color:#9fdfff;">${d.best_student_week?.class || ""}</div>
+          <div style="margin-top:10px;font-size:1.3em;">Bahosi: ${d.best_student_week?.score || "-"}</div>
         </div>`));
-      slides.appendChild(makeSlide('🏫 Haftaning eng yaxshi sinfi',`<div class="card"><b>${d.best_class_week?.class||"-"}</b><br>O‘rtacha baho: ${d.best_class_week?.avg||"-"}</div>`));
-     slides.appendChild(makeSlide('🏆 Chorakdagi eng yaxshi sinflar',
-  d.top_classes_quarter.length
-    ? d.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join('')
-    : '<div class="card">Maʼlumot yo‘q</div>'
-));
 
+      slides.appendChild(makeSlide("🏫 Haftaning eng yaxshi sinfi",
+        `<div class="card"><b>${d.best_class_week?.class || "-"}</b><br>O‘rtacha baho: ${d.best_class_week?.avg || "-"}</div>`
+      ));
 
-    function renderFloors(d){
-      const cont=document.getElementById('floors');cont.innerHTML='';
-      d.floors.sort((a,b)=>Number(b.floor)-Number(a.floor));
-      d.floors.forEach(f=>{
-        const div=document.createElement('div');
-        div.className='floor';div.innerHTML=`<h2>${f.floor}-qavat</h2>`;
-        const rooms=document.createElement('div');rooms.className='rooms';
-        f.rooms.forEach(r=>{
+      slides.appendChild(makeSlide("🏆 Chorakdagi eng yaxshi sinflar",
+        d.top_classes_quarter.length
+          ? d.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join('')
+          : "<div class='card'>Maʼlumot yo‘q</div>"
+      ));
+    }
+
+    function renderFloors(d) {
+      const cont = document.getElementById('floors');
+      cont.innerHTML = '';
+      d.floors.sort((a, b) => Number(b.floor) - Number(a.floor));
+      d.floors.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'floor';
+        div.innerHTML = `<h2>${f.floor}-qavat</h2>`;
+        const rooms = document.createElement('div');
+        rooms.className = 'rooms';
+        f.rooms.forEach(r => {
           const scheduleInfo = d.schedule.find(s => s.room === r.room);
           const subject = scheduleInfo?.subject || r.subject || '—';
           const teacher = scheduleInfo?.teacher || r.teacher || '';
-          const el=document.createElement('div');el.className='room';
-          el.innerHTML=`
-            <img src="${r.teacher_img||'https://i.imgur.com/L8P8C2Y.png'}" alt="teacher">
-            <div><div style="font-weight:700">${r.room} — ${r.class||''}</div>
+          const el = document.createElement('div');
+          el.className = 'room';
+          el.innerHTML = `
+            <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" alt="teacher">
+            <div><div style="font-weight:700">${r.room} — ${r.class || ''}</div>
             <div style="color:#9fb0c0">${subject}</div>
             <div style="font-size:14px;color:#9fb0c0">${teacher}</div></div>`;
-          el.onclick=()=>showModal({room:r.room,class:r.class,subject,teacher,teacher_img:r.teacher_img});
+          el.onclick = () => showModal({ room: r.room, class: r.class, subject, teacher, teacher_img: r.teacher_img });
           rooms.appendChild(el);
         });
-        div.appendChild(rooms);cont.appendChild(div);
+        div.appendChild(rooms);
+        cont.appendChild(div);
       });
     }
 
-    function showModal(r){
-      const m=document.getElementById('modal');const c=document.getElementById('modal-content');
-      c.innerHTML=`
-        <img src="${r.teacher_img||'https://i.imgur.com/L8P8C2Y.png'}" alt="teacher">
-        <h3>${r.room} — ${r.class||''}</h3>
-        <p style="color:#00c4ff;font-size:18px;margin:6px 0">${r.subject||'—'}</p>
-        <p>O‘qituvchi: <b>${r.teacher||'—'}</b></p>
+    function showModal(r) {
+      const m = document.getElementById('modal');
+      const c = document.getElementById('modal-content');
+      c.innerHTML = `
+        <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" alt="teacher">
+        <h3>${r.room} — ${r.class || ''}</h3>
+        <p style="color:#00c4ff;font-size:18px;margin:6px 0">${r.subject || '—'}</p>
+        <p>O‘qituvchi: <b>${r.teacher || '—'}</b></p>
         <button class="modal-close" onclick="closeModal()">Yopish</button>`;
       m.classList.add('show');
     }
 
-    function closeModal(){document.getElementById('modal').classList.remove('show');}
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
 
-    const overlay=document.getElementById('overlay');
-    const hint=document.getElementById('hint');
-    hint.onclick=()=>{
+    const overlay = document.getElementById('overlay');
+    const hint = document.getElementById('hint');
+    hint.onclick = () => {
       overlay.classList.add('open');
-      overlay.setAttribute('aria-hidden','false');
-      current=0;
+      overlay.setAttribute('aria-hidden', 'false');
+      current = 0;
       showSlide(current);
     };
-    document.getElementById('close').onclick=()=>{overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');};
-    overlay.addEventListener('click',e=>{if(e.target===overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');closeModal();}});
+    document.getElementById('close').onclick = () => {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+    };
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+        closeModal();
+      }
+    });
 
-    function showSlide(i){document.querySelectorAll('.slide').forEach((s,n)=>s.classList.toggle('active',n===i));}
-    function updateClock(){const n=new Date();const h=n.getHours().toString().padStart(2,'0');const m=n.getMinutes().toString().padStart(2,'0');document.getElementById('clock').textContent=`${h}:${m}`;}
+    function showSlide(i) {
+      document.querySelectorAll('.slide').forEach((s, n) => s.classList.toggle('active', n === i));
+    }
 
-    let current=0;
-    (async()=>{
+    function updateClock() {
+      const n = new Date();
+      const h = n.getHours().toString().padStart(2, '0');
+      const m = n.getMinutes().toString().padStart(2, '0');
+      document.getElementById('clock').textContent = `${h}:${m}`;
+    }
+
+    let current = 0;
+    (async () => {
       updateDate();
       setInterval(updateDate, 60000);
-      const mainRows=await loadSheet(RANGE_MAIN);
-      const scheduleRows=await loadSheet(RANGE_SCHEDULE);
-      const allRows=[...mainRows,...scheduleRows];
-      const d=parseData(allRows);
+      const mainRows = await loadSheet(RANGE_MAIN);
+      const scheduleRows = await loadSheet(RANGE_SCHEDULE);
+      const allRows = [...mainRows, ...scheduleRows];
+      const d = parseData(allRows);
       renderSlides(d);
       renderFloors(d);
-      const s=document.querySelectorAll('.slide');
-      if(s.length)showSlide(0);
-      setInterval(()=>{if(!s.length)return;s[current].classList.remove('active');current=(current+1)%s.length;s[current].classList.add('active');},7000);
-      updateClock();setInterval(updateClock,1000);
+      const s = document.querySelectorAll('.slide');
+      if (s.length) showSlide(0);
+      setInterval(() => {
+        if (!s.length) return;
+        s[current].classList.remove('active');
+        current = (current + 1) % s.length;
+        s[current].classList.add('active');
+      }, 7000);
+      updateClock();
+      setInterval(updateClock, 1000);
     })();
   </script>
 </body>
 </html>
-
