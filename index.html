@@ -245,6 +245,7 @@
     const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
     const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
     const RANGE_MAIN = "Лист1!A1:M100";
+    const RANGE_SCHEDULE = "schedule!A1:H100";
 
     const oylar = ["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentyabr","oktyabr","noyabr","dekabr"];
     const kunlar = ["yakshanba","dushanba","seshanba","chorshanba","payshanba","juma","shanba"];
@@ -271,6 +272,7 @@
         best_class_week: rows.find(r=>r.type==="best_class_week"),
         recent_events: rows.filter(r=>r.type==="recent_event"),
         top_classes_quarter: rows.filter(r=>r.type==="top_class_quarter"),
+        schedule: rows.filter(r=>r.type==="schedule"),
         floors:Object.values(rows.filter(r=>r.type==="room_info").reduce((a,r)=>{
           const f=r.floor||'0';if(!a[f])a[f]={floor:f,rooms:[]};a[f].rooms.push(r);return a;},{}))
       };
@@ -301,13 +303,16 @@
         div.className='floor';div.innerHTML=`<h2>${f.floor}-qavat</h2>`;
         const rooms=document.createElement('div');rooms.className='rooms';
         f.rooms.forEach(r=>{
+          const scheduleInfo = d.schedule.find(s => s.room === r.room);
+          const subject = scheduleInfo?.subject || r.subject || '—';
+          const teacher = scheduleInfo?.teacher || r.teacher || '';
           const el=document.createElement('div');el.className='room';
           el.innerHTML=`
             <img src="${r.teacher_img||'https://i.imgur.com/L8P8C2Y.png'}" alt="teacher">
             <div><div style="font-weight:700">${r.room} — ${r.class||''}</div>
-            <div style="color:#9fb0c0">${r.subject||'—'}</div>
-            <div style="font-size:14px;color:#9fb0c0">${r.teacher||''}</div></div>`;
-          el.onclick=()=>showModal(r);
+            <div style="color:#9fb0c0">${subject}</div>
+            <div style="font-size:14px;color:#9fb0c0">${teacher}</div></div>`;
+          el.onclick=()=>showModal({room:r.room,class:r.class,subject,teacher,teacher_img:r.teacher_img});
           rooms.appendChild(el);
         });
         div.appendChild(rooms);cont.appendChild(div);
@@ -346,8 +351,10 @@
     (async()=>{
       updateDate();
       setInterval(updateDate, 60000);
-      const rows=await loadSheet(RANGE_MAIN);
-      const d=parseData(rows);
+      const mainRows=await loadSheet(RANGE_MAIN);
+      const scheduleRows=await loadSheet(RANGE_SCHEDULE);
+      const allRows=[...mainRows,...scheduleRows];
+      const d=parseData(allRows);
       renderSlides(d);
       renderFloors(d);
       const s=document.querySelectorAll('.slide');
