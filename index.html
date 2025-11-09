@@ -1,384 +1,704 @@
-Skip to content
-Navigation Menu
-abdurahmon2909
-School-TV
-
-Type / to search
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-1
-Insights
-Settings
-Files
-Go to file
-t
-Procfile
-index.html
-package.json
-railway.toml
-School-TV
-/index.html
-abdurahmon2909
-abdurahmon2909
-Update index.html
-e20d90b
- · 
-1 hour ago
-School-TV
-/index.html
-
-Code
-
-Blame
-346 lines (304 loc) · 11.5 KB
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maktab Axborot Paneli</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>155-maktab Axborot Paneli</title>
   <style>
-    :root {
-      --bg: #081121;
-      --accent: #00c4ff;
-      --card-bg: rgba(255, 255, 255, 0.08);
-      --text: #f0f8ff;
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html, body { height:100%; overflow:hidden; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg,#3ac8ff 0%, #9be7d9 50%, #ffde7b 100%);
+      color:#033047;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      height: 100%;
-      font-family: "Poppins", "Inter", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow: hidden;
+    .container {
+      width:95vw; height:95vh;
+      border-radius:24px;
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      position:relative;
+      padding:32px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      overflow:hidden;
     }
 
-    .screen {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+    .school-name {
+      font-size:70px;
+      font-weight:900;
+      margin:6px 0 16px;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      color:#fff;
     }
 
-    #clock {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 38px;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: 1px;
-    }
-
-    .slides {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      transition: transform 0.6s ease-in-out;
+    .datetime {
+      position:absolute;
+      top:20px;
+      right:30px;
+      text-align:right;
+      font-size:22px;
+      line-height:1.4;
+      font-weight:600;
+      color:#fff;
+      display:flex;
+      flex-direction:column-reverse;
+      align-items:flex-end;
     }
 
     .slide {
-      min-width: 100%;
-      height: 100%;
-      padding: 40px;
+      width:95%;
+      height:80%;
+      border-radius:22px;
+      background: rgba(255,255,255,0.55);
+      padding:60px 35px 35px 35px;
+      margin-top:12px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      align-items:center;
+      text-align:center;
+      overflow:auto;
+      font-size:20px;
+      color:#012a33;
+      box-shadow: 0 0 40px rgba(255,255,255,0.2);
+      transition: opacity .45s ease;
+    }
+
+    .slide.fade-out { opacity:0; }
+
+    .slide h2 {
+      margin-top:0;
+      margin-bottom:25px;
+      font-size:32px;
+    }
+
+    .menu-btn {
+      position:absolute;
+      bottom:18px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:1100;
+      background:#ffbb00;
+      color:#000;
+      border:none;
+      padding:20px 50px;
+      border-radius:32px;
+      font-size:20px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 8px 18px rgba(0,0,0,0.25);
+      transition: all .3s ease;
+    }
+
+    .menu-btn:hover { transform:translateX(-50%) scale(1.05); }
+
+    .menu-overlay {
+      position:absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(8px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .35s ease;
+      z-index:900;
+    }
+
+    .menu-overlay.active { opacity:1; pointer-events:auto; }
+
+    .menu-panel {
+      position:absolute;
+      top:100%;
+      left:0;
+      width:100%;
+      height:100%;
+      padding:20px 40px;
+      display:flex;
+      gap:20px;
+      justify-content:center;
+      align-items:flex-start;
+      overflow-y:auto;
+      transition: top .45s ease;
+      z-index:1000;
+      background: rgba(255,255,255,0.95);
+    }
+
+    .menu-panel.open { top:0; }
+
+    .menu-panel * { font-size:14px; }
+
+    /* ===== ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ КАРТОЧЕК КОМНАТ ===== */
+    .floor-light {
+      min-width:280px;
+      border-radius:14px;
+      padding:12px;
+      background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(245,245,245,0.9));
+      box-shadow:0 0 15px rgba(0,0,0,0.06);
+      font-size:13px;
+      color:#012a33;
+    }
+
+    .floor-light h3 { 
+      margin:0 0 8px; 
+      font-size:15px; 
+      font-weight:700; 
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Обычная карточка комнаты */
+    .room-light {
+      padding:12px;
+      margin:8px 0;
+      border-radius:10px;
+      font-size:13px;
+      background:#fff;
+      color:#012a33;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    /* Подсвеченная карточка комнаты */
+    .room-light.highlight {
+      background: linear-gradient(90deg, #fff4d6, #fff1c4);
+      border-left: 4px solid #ffbb00;
+      box-shadow: 0 4px 12px rgba(255, 187, 0, 0.15);
+    }
+
+    .room-icon {
+      font-size: 18px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.03);
+      flex-shrink: 0;
+    }
+
+    .room-light.highlight .room-icon {
+      background: rgba(255, 187, 0, 0.12);
+    }
+
+    .room-info { 
+      flex: 1;
+    }
+
+    .room-name { 
+      font-weight: 800; 
+      font-size: 15px; 
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .class-name { 
+      color: #345; 
+      font-weight: 600; 
+      margin-bottom: 4px;
+    }
+
+    .teacher { 
+      color: #567; 
+      font-size: 12px; 
+      margin-bottom: 2px;
+    }
+
+    .desc { 
+      color: #789; 
+      font-size: 11px; 
+      opacity: 0.9;
+    }
+
+    /* --- photo slider --- */
+    .slider-container {
+      position: relative;
+      width: 100%;
+      min-height: 240px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      margin-top: 12px;
+      overflow: hidden;
     }
 
-    .slide-inner {
-      background: var(--card-bg);
-      padding: 40px;
-      border-radius: 24px;
-      backdrop-filter: blur(8px);
-      width: 80%;
-      max-width: 900px;
-      text-align: center;
-      animation: fadeIn 1s ease;
-    }
-
-    h1 { font-size: 44px; margin-bottom: 20px; color: var(--accent); }
-    .card {
-      background: rgba(255,255,255,0.05);
-      padding: 20px 30px;
-      border-radius: 16px;
-      margin: 10px 0;
-      font-size: 26px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .footer {
-      position: absolute;
-      bottom: 40px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .hint {
-      display: inline-block;
-      padding: 16px 28px;
-      background: linear-gradient(90deg, rgba(0,196,255,0.3), rgba(180,58,255,0.3));
-      border-radius: 999px;
-      font-weight: 600;
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 22px;
-      backdrop-filter: blur(8px);
-    }
-
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
-      transform: translateY(100%);
-      transition: transform 0.4s ease;
-      padding: 30px;
-      overflow-y: auto;
-      font-size: 22px;
-    }
-
-    .overlay.open { transform: translateY(0); }
-
-    .floor { margin-bottom: 40px; }
-    .floor h2 { color: var(--accent); margin-bottom: 15px; font-size: 32px; }
-    .rooms { display: flex; flex-wrap: wrap; gap: 12px; }
-
-    .room {
-      background: var(--card-bg);
-      padding: 16px 22px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      font-size: 24px;
-    }
-
-    .room:hover { background: rgba(0,196,255,0.3); }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal.show { display: flex; }
-
-    .modal-content {
-      background: #111a2b;
-      padding: 28px;
+    .slider-images { position: relative; width:100%; display:flex; justify-content:center; align-items:center; min-height:180px; }
+    .slider-img {
+      max-width: 100%;
+      max-height: 420px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
       border-radius: 14px;
-      text-align: center;
-      font-size: 24px;
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.12);
+    }
+    .slider-img.active { opacity: 1; position: relative; }
+
+    .slider-dots {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+      gap: 8px;
+    }
+    .dot {
+      width:11px; height:11px; border-radius:50%;
+      background: rgba(0,0,0,0.12);
+      transition: all .25s ease; cursor:pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .dot.active-dot {
+      background: #ffb700;
+      transform: scale(1.25);
+      box-shadow: 0 6px 18px rgba(255,183,0,0.35);
     }
 
-    .modal-content button {
-      margin-top: 14px;
-      padding: 10px 20px;
-      background: var(--accent);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      font-size: 22px;
+    /* --- main slide dots --- */
+    .main-dots {
+      position:absolute;
+      bottom:94px;
+      display:flex;
+      gap:10px;
+      z-index:1100;
+    }
+    .main-dot {
+      width:14px; height:14px; border-radius:50%;
+      background: rgba(255,255,255,0.45);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      cursor:pointer; transition: all .25s ease;
+    }
+    .main-dot.active { background:#ffbb00; transform:scale(1.25); }
+
+    @media (max-width:900px){
+      .school-name{ font-size:42px; }
+      .slide{ height:75%; width:95%; font-size:16px; padding-top:40px; }
+      .menu-btn{ padding:14px 28px; font-size:16px; }
+      .datetime{ font-size:18px; }
+      .menu-panel { padding:20px; flex-wrap:wrap; }
+      .floor-light { min-width: 240px; }
     }
   </style>
 </head>
 <body>
-  <div class="screen">
-    <div id="clock"></div>
-    <div class="slides" id="slides"></div>
+  <div class="container">
+    <div class="datetime" id="datetime"></div>
+    <div class="school-name">155-maktab</div>
+    <div class="slide" id="slide-content">Ma'lumot yuklanmoqda...</div>
 
-    <div class="footer">
-      <div class="hint" id="hint">📋 Menyuga kirish uchun ekranga bosing</div>
-    </div>
+    <div class="main-dots" id="main-dots"></div>
 
-    <div class="overlay" id="overlay">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px">
-        <h2>🏫 Maktab qavatlari</h2>
-        <button id="close" style="background:var(--accent);border:none;border-radius:10px;padding:8px 16px;color:#fff;cursor:pointer;font-size:20px">Yopish</button>
-      </div>
-      <div id="floors"></div>
-    </div>
+    <button class="menu-btn" id="menu-btn">Xonalar menyusi</button>
 
-    <div class="modal" id="modal">
-      <div class="modal-content" id="modal-content"></div>
-    </div>
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="menu-panel" id="menu-panel"></div>
   </div>
 
   <script>
+    /* ===== CONFIG ===== */
     const SHEET_ID = "1Z1wyUYj4l-D_egywsnPEiLU7CbXs7OFVN5qbAQ9ttzA";
-    const API_KEY = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
-    const RANGE_MAIN = "Лист1!A1:M100";
-    const RANGE_SCHEDULE = "Schedule!A1:F100";
+    const API_KEY  = "AIzaSyApl7_bMpqpB9GXrxUtVAfaTfNtrhyEcgM";
 
-    async function loadSheet(range) {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+    const SHEETS = {
+      news: "News!A2:D100",
+      students: "TopStudents!A2:C100",
+      classes: "TopClass!A2:C100",
+      rooms: "Rooms!A2:F200", // A:Floor, B:Room, C:Class, D:Teacher, E:Description, F:highlight
+      quarter: "QuarterBestClasses!A2:D100"
+    };
+
+    /* ===== ДОБАВЛЕННЫЕ ФУНКЦИИ ===== */
+    
+    // Функция для безопасного получения данных из строки
+    function safeGet(row, idx){ 
+      return (row && row[idx]) ? String(row[idx]).trim() : ""; 
+    }
+
+    // Функция выбора иконки на основе текста
+    function chooseIcon(text){
+      if(!text) return "📍";
+      text = String(text).toLowerCase();
+      if(text.match(/rahbariyat/)) return "👔";
+      if(text.match(/informat|kompyut|ict|computer|kod/)) return "💻";
+      if(text.match(/matem|algebr|➗|matemat/)) return "➗";
+      if(text.match(/bio|biolog|🧬/)) return "🧬";
+      if(text.match(/kimy|kimyo|lab/)) return "🔬";
+      if(text.match(/fizik|fizika|⚗️|🏋/)) return "⚙️";
+      if(text.match(/ona|til|tili|language|/)) return "📚";
+      if(text.match(/kitob|kutubxona|kutub/)) return "📖";
+      if(text.match(/san'at|tasvir|rassom|art/)) return "🎨";
+      if(text.match(/sport|stad|gym/)) return "🏅";
+      if(text.match(/ma'naviyat|maonav|ma'nav/)) return "🕊️";
+      if(text.match(/ma'lumot|info|office/)) return "🏢";
+      if(text.match(/tibbiyot|tibbiy/)) return "💊";
+      if(text.match(/chet tili|ingliz/)) return "🔤";
+      if(text.match(/boshlang/)) return "🎈";
+      return "📍"; 
+    }
+
+    let slides = [], currentSlide = 0;
+
+    async function fetchSheet(range){
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
       const res = await fetch(url);
-      const json = await res.json();
-      const [headers, ...rows] = json.values;
-      return rows.map(r => Object.fromEntries(headers.map((h, i) => [h, r[i]])));
+      const data = await res.json();
+      return data.values || [];
     }
 
-    function parseData(rows) {
-      return {
-        best_student_week: rows.find(r => r.type === "best_student_week"),
-        best_class_week: rows.find(r => r.type === "best_class_week"),
-        recent_events: rows.filter(r => r.type === "recent_event"),
-        top_classes_quarter: rows.filter(r => r.type === "top_class_quarter"),
-        floors: Object.values(rows.filter(r => r.type === "room_info").reduce((acc, r) => {
-          if (!acc[r.floor]) acc[r.floor] = { floor: r.floor, rooms: [] };
-          acc[r.floor].rooms.push(r);
-          return acc;
-        }, {}))
+    /* ====== Slider core (fixed) ====== */
+    const SLIDER_INTERVALS = new Map();
+
+    function getImageArray(cell) {
+      if (!cell) return [];
+      if (Array.isArray(cell)) cell = cell.join(",");
+      const found = Array.from(cell.matchAll(/https?:\/\/[^\s,;]+/g)).map(m => m[0].trim());
+      if (found.length) return found;
+      return cell.split(/[,;\n\s]+/).map(x => x.trim()).filter(x => x.startsWith("http"));
+    }
+
+    function createImageSlider(imagesRaw) {
+      if (!imagesRaw || (Array.isArray(imagesRaw) && imagesRaw.length === 0)) return "";
+      const images = getImageArray(imagesRaw);
+      if (!images.length) return "";
+
+      const id = "slider-" + Math.random().toString(36).substr(2, 9);
+
+      const imgsHtml = images.map(
+        (url, i) => `<img src="${url}" class="slider-img ${i === 0 ? "active" : ""}" data-index="${i}" alt="rasm">`
+      ).join("");
+
+      const dotsHtml = images.map(
+        (_, i) => `<span class="dot ${i === 0 ? "active-dot" : ""}" data-index="${i}"></span>`
+      ).join("");
+
+      const html = `
+        <div class="slider-container" id="${id}">
+          <div class="slider-images">${imgsHtml}</div>
+          <div class="slider-dots">${dotsHtml}</div>
+        </div>
+      `;
+
+      return html;
+    }
+
+    function startSlider(container, count) {
+      const el = (typeof container === "string") ? document.getElementById(container) : container;
+      if (!el) return;
+      const imgs = el.querySelectorAll(".slider-img");
+      const dots = el.querySelectorAll(".dot");
+      if (!imgs.length || count < 2) return;
+
+      const id = el.id || null;
+      if (id && SLIDER_INTERVALS.has(id)) {
+        clearInterval(SLIDER_INTERVALS.get(id));
+        SLIDER_INTERVALS.delete(id);
+      }
+
+      let cur = 0;
+      imgs.forEach((img,i)=> img.classList.toggle("active", i===0));
+      dots.forEach((d,i)=> d.classList.toggle("active-dot", i===0));
+
+      const switchTo = (index) => {
+        imgs[cur].classList.remove("active");
+        dots[cur].classList.remove("active-dot");
+        cur = index;
+        imgs[cur].classList.add("active");
+        dots[cur].classList.add("active-dot");
       };
+
+      dots.forEach((dot, i) => {
+        dot.onclick = () => {
+          if (id && SLIDER_INTERVALS.has(id)) {
+            clearInterval(SLIDER_INTERVALS.get(id));
+            SLIDER_INTERVALS.delete(id);
+          }
+          switchTo(i);
+          const newId = setInterval(()=> switchTo((cur+1)%count), 2000);
+          if (id) SLIDER_INTERVALS.set(id, newId);
+        };
+      });
+
+      const intervalId = setInterval(()=> switchTo((cur+1)%count), 2000);
+      if (id) SLIDER_INTERVALS.set(id, intervalId);
     }
 
-    function getCurrentLesson(schedule, room) {
-      const now = new Date();
-      const current = now.getHours() * 60 + now.getMinutes();
-      return schedule.find(s => {
-        const [sh, sm] = s.start.split(":").map(Number);
-        const [eh, em] = s.end.split(":").map(Number);
-        const start = sh * 60 + sm;
-        const end = eh * 60 + em;
-        return s.room === room && current >= start && current <= end;
-      }) || null;
+    function clearAllSliderIntervals() {
+      SLIDER_INTERVALS.forEach(v => clearInterval(v));
+      SLIDER_INTERVALS.clear();
     }
 
-    function renderFloors(DATA, schedule) {
-      const floors = document.getElementById("floors");
-      floors.innerHTML = "";
-      DATA.floors.sort((a, b) => b.floor - a.floor).forEach(f => {
-        const div = document.createElement("div");
-        div.className = "floor";
-        div.innerHTML = `<h2>${f.floor}-qavat</h2>`;
-        const rooms = document.createElement("div");
-        rooms.className = "rooms";
-        f.rooms.forEach(r => {
-          const card = document.createElement("div");
-          card.className = "room";
-          const lesson = getCurrentLesson(schedule, r.room);
-          const subject = lesson ? lesson.subject : "— Dars yo‘q —";
-          const teacher = lesson ? lesson.teacher : "";
-          card.innerHTML = `
-            <div style="display:flex;align-items:center;gap:10px;">
-              <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}" 
-                   style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);">
-              <div>
-                <b>${r.room}</b> — ${r.class}<br>
-                <span style="color:#00c4ff">${subject}</span><br>
-                <small>${teacher}</small>
-              </div>
-            </div>`;
-          card.onclick = () => showModal({ ...r, subject, teacher });
-          rooms.appendChild(card);
-        });
-        div.appendChild(rooms);
-        floors.appendChild(div);
+    function initSlidersInSlide() {
+      const slideRoot = document.getElementById("slide-content");
+      if (!slideRoot) return;
+      const containers = slideRoot.querySelectorAll(".slider-container");
+      containers.forEach(c => {
+        const imgs = c.querySelectorAll(".slider-img");
+        startSlider(c, imgs.length);
       });
     }
 
-    function makeSlide(title, content) {
-      const s = document.createElement("div");
-      s.className = "slide";
-      s.innerHTML = `<div class="slide-inner"><h1>${title}</h1>${content}</div>`;
-      return s;
+    /* ===== Rendering sections ===== */
+    function renderNews(rows) {
+      if (!rows.length) return "<p>Yangiliklar yo'q</p>";
+      return rows.map(r=>{
+        const images = getImageArray(r[3]);
+        return `<div style="margin-bottom:36px;">
+          <h3>${safeGet(r, 1)}</h3>
+          <small style="opacity:0.7;">${safeGet(r, 0)}</small>
+          <p style="margin:10px 0;">${safeGet(r, 2)}</p>
+          ${createImageSlider(images)}
+        </div>`;
+      }).join("<hr>");
     }
 
-    function renderSlides(DATA) {
-      const slides = document.getElementById("slides");
-      slides.innerHTML = "";
-
-      slides.appendChild(makeSlide("🎓 Haftaning eng yaxshi o‘quvchisi", `
-        <div class="card" style="display:flex;flex-direction:column;align-items:center;">
-          <img src="${
-            (DATA.best_student_week &&
-             DATA.best_student_week.student_img &&
-             DATA.best_student_week.student_img.includes('http'))
-               ? DATA.best_student_week.student_img
-               : 'https://i.imgur.com/xO5T4.gif'
-          }"
-          style="width:220px;height:220px;object-fit:cover;border-radius:50%;margin-bottom:20px;
-          border:4px solid var(--accent);box-shadow:0 0 20px rgba(0,196,255,0.3);animation:fadeIn 1.5s ease;"
-          alt="O‘quvchi rasmi">
-          <b style="font-size:1.8em;">${DATA.best_student_week?.name || "—"}</b> 
-          <div style="font-size:1.4em;color:#9fdfff;">${DATA.best_student_week?.class || ""}</div>
-          <div style="margin-top:10px;font-size:1.3em;">Bahosi: ${DATA.best_student_week?.score || "-"}</div>
-        </div>`));
-
-      slides.appendChild(makeSlide("🏫 Haftaning eng yaxshi sinfi", `<div class="card"><b>${DATA.best_class_week?.class || "-"}</b><br>O‘rtacha baho: ${DATA.best_class_week?.avg || "-"}</div>`));
-      slides.appendChild(makeSlide("🗓 So‘nggi voqealar", DATA.recent_events.map(e => `<div class="card"><b>${e.title}</b><div>${e.date}</div></div>`).join("")));
-      slides.appendChild(makeSlide("🏆 Chorakdagi eng yaxshi sinflar", DATA.top_classes_quarter.map(c => `<div class="card"><b>${c.class}</b> — ${c.avg}</div>`).join("")));
+    function renderStudents(rows) {
+      if (!rows.length) return "<p>Ma'lumot yo'q</p>";
+      return rows.map(r=>{
+        const images = getImageArray(r[2]);
+        return `<div style="margin-bottom:24px;">
+          <b>${safeGet(r, 0)}</b> — ${safeGet(r, 1)}
+          ${createImageSlider(images)}
+        </div>`;
+      }).join("<hr>");
     }
 
-    function showSlide(i) {
-      const slides = document.querySelectorAll(".slide");
-      slides.forEach((el, idx) => { el.style.transform = `translateX(${(idx - i) * 100}%)`; });
+    function renderClasses(rows) {
+      if (!rows.length) return "<p>Ma'lumot yo'q</p>";
+      return rows.map(r=>{
+        const images = getImageArray(r[2]);
+        return `<div style="margin-bottom:24px;">
+          <b>${safeGet(r, 0)}</b> — ${safeGet(r, 1)}
+          ${createImageSlider(images)}
+        </div>`;
+      }).join("<hr>");
     }
 
-    function showModal(r) {
-      const modal = document.getElementById("modal");
-      const cont = document.getElementById("modal-content");
-      cont.innerHTML = `
-        <img src="${r.teacher_img || 'https://i.imgur.com/L8P8C2Y.png'}"
-             style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:16px;border:3px solid var(--accent);" alt="O‘qituvchi rasmi">
-        <h3>${r.room} — ${r.class}</h3>
-        <p style="font-size:24px;color:#00c4ff;">${r.subject}</p>
-        <p style="margin-top:6px;">O‘qituvchi: <b>${r.teacher}</b></p>
-        <button onclick="closeModal()">Yopish</button>`;
-      modal.classList.add("show");
+    function renderQuarter(rows) {
+      if (!rows.length) return "<p>Ma'lumot yo'q</p>";
+      return rows.map(r=>{
+        const images = getImageArray(r[3]);
+        return `<div style="margin-bottom:24px;">
+          <b>${safeGet(r, 0)}</b> — ${safeGet(r, 1)} ball (${safeGet(r, 2)})
+          ${createImageSlider(images)}
+        </div>`;
+      }).join("<hr>");
     }
 
-    function closeModal() { document.getElementById("modal").classList.remove("show"); }
+    /* ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ RENDERROOMS ДЛЯ ВАШЕЙ СТРУКТУРЫ ДАННЫХ ===== */
+    function renderRooms(rows) {
+      if (!rows.length) return '<p>Maʼlumot yoʻq</p>';
 
-    document.getElementById("hint").onclick = () => document.getElementById("overlay").classList.add("open");
-    document.getElementById("close").onclick = () => document.getElementById("overlay").classList.remove("open");
+      // Группируем по этажам
+      const grouped = {};
 
-    function updateClock() {
-      const clock = document.getElementById("clock");
-      const now = new Date();
-      const h = now.getHours().toString().padStart(2, "0");
-      const m = now.getMinutes().toString().padStart(2, "0");
-      clock.textContent = `${h}:${m}`;
+      rows.forEach(r => {
+        const floor = safeGet(r, 0) || '?';
+        const room = safeGet(r, 1) || '';
+        const className = safeGet(r, 2) || '';
+        const teacher = safeGet(r, 3) || '';
+        const description = safeGet(r, 4) || '';
+        const highlightFlag = safeGet(r, 5) || ''; // Колонка F - highlight
+
+        if (!grouped[floor]) grouped[floor] = [];
+
+        // Проверяем нужно ли подсвечивать (yes в колонке highlight)
+        const isHighlight = highlightFlag.toLowerCase() === 'yes';
+
+        // Выбираем иконку на основе описания или названия класса
+        const icon = chooseIcon(description + " " + className);
+
+        grouped[floor].push({ 
+          room, 
+          className,
+          teacher,
+          description,
+          isHighlight,
+          icon
+        });
+      });
+
+      return `<div style='display:flex;flex-wrap:wrap;gap:20px;justify-content:center;'>${
+        Object.keys(grouped).sort().map(f => `
+          <div class='floor-light'>
+            <h3>${f}-qavat</h3>
+            ${grouped[f].map(rr => `
+              <div class='room-light ${rr.isHighlight ? "highlight" : ""}'>
+                <div class='room-icon'>${rr.icon}</div>
+                <div class='room-info'>
+                  <span class='room-name'>Xona ${rr.room}</span>
+                  ${rr.className ? `<div class='class-name'>${rr.className}</div>` : ''}
+                  ${rr.teacher ? `<div class='teacher'>${rr.teacher}</div>` : ''}
+                  ${rr.description ? `<div class='desc'>${rr.description}</div>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')
+      }</div>`;
     }
 
-    (async () => {
-      const mainData = await loadSheet(RANGE_MAIN);
-      const scheduleData = await loadSheet(RANGE_SCHEDULE);
-      const DATA = parseData(mainData);
+    /* ===== Load and build slides ===== */
+    async function loadData(){
+      const [news, students, classes, rooms, quarter] = await Promise.all([
+        fetchSheet(SHEETS.news),
+        fetchSheet(SHEETS.students),
+        fetchSheet(SHEETS.classes),
+        fetchSheet(SHEETS.rooms),
+        fetchSheet(SHEETS.quarter)
+      ]);
 
-      renderSlides(DATA);
-      renderFloors(DATA, scheduleData);
-      showSlide(0);
+      slides = [
+        { title: "📰 Yangiliklar", content: renderNews(news) },
+        { title: "🏅 Haftaning eng yaxshi o'quvchisi", content: renderStudents(students) },
+        { title: "🏫 Haftaning eng yaxshi sinfi", content: renderClasses(classes) },
+        { title: "📊 Chorak bo‘yicha eng yaxshi ko‘rsatkichli sinflar", content: renderQuarter(quarter) },
+        { title: "🏢 Xonalar va darslar", content: renderRooms(rooms) }
+      ];
 
-      let i = 0;
-      setInterval(() => { i = (i + 1) % document.querySelectorAll(".slide").length; showSlide(i); }, 5000);
-      setInterval(updateClock, 1000);
-      updateClock();
+      renderMenu(rooms);
+      renderMainDots();
+      showSlide();
+    }
 
-      setInterval(async () => {
-        const newSchedule = await loadSheet(RANGE_SCHEDULE);
-        renderFloors(DATA, newSchedule);
-      }, 60000);
+    /* ===== Slide switching ===== */
+    function fadeSlide(html){
+      const el=document.getElementById("slide-content");
+      el.classList.add("fade-out");
+      clearAllSliderIntervals();
+      setTimeout(()=>{
+        el.innerHTML=html;
+        el.classList.remove("fade-out");
+        initSlidersInSlide();
+      },420);
+    }
+
+    function showSlide(){
+      if(!slides.length)return;
+      const s=slides[currentSlide%slides.length];
+      fadeSlide(`<h2>${s.title}</h2>${s.content}`);
+      updateMainDots();
+    }
+
+    // auto-advance main slides every 8s
+    setInterval(()=>{
+      if(!slides.length) return;
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide();
+    },8000);
+
+    /* ===== Main dots (sections) ===== */
+    function renderMainDots(){
+      const dots=document.getElementById("main-dots");
+      dots.innerHTML=slides.map((_,i)=>`<div class="main-dot ${i===0?"active":""}" data-index="${i}"></div>`).join("");
+      dots.querySelectorAll(".main-dot").forEach(dot=>{
+        dot.addEventListener("click",()=>{
+          currentSlide=parseInt(dot.dataset.index,10);
+          showSlide();
+        });
+      });
+    }
+
+    function updateMainDots(){
+      const all=document.querySelectorAll(".main-dot");
+      all.forEach((d,i)=>d.classList.toggle("active", i === (currentSlide % slides.length)));
+    }
+
+    /* ===== Menu & Time ===== */
+    function renderMenu(rows){
+      document.getElementById("menu-panel").innerHTML=renderRooms(rows);
+    }
+
+    const btn=document.getElementById("menu-btn");
+    const overlay=document.getElementById("menu-overlay");
+    const panel=document.getElementById("menu-panel");
+    btn.addEventListener("click",()=>{
+      const open=panel.classList.toggle("open");
+      overlay.classList.toggle("active",open);
+      btn.textContent=open?"Menyu yopish":"Xonalar menyusi";
+    });
+    overlay.addEventListener("click",()=>{
+      panel.classList.remove("open");
+      overlay.classList.remove("active");
+      btn.textContent="Xonalar menyusi";
+    });
+
+    function updateTime(){
+      const n=new Date();
+      const days=["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"];
+      document.getElementById("datetime").innerHTML=`
+        <div>${n.toLocaleDateString()}</div>
+        <div>${days[n.getDay()]}</div>
+        <div>${n.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
+    }
+
+    setInterval(updateTime,1000); updateTime();
+
+    /* ===== Touch support for slide switching ===== */
+    (function enableTouchNavigation(){
+      let startX = 0;
+      let distX = 0;
+      const threshold = 60;
+
+      document.addEventListener("touchstart", e => {
+        const t = e.touches[0];
+        startX = t.clientX;
+      });
+
+      document.addEventListener("touchmove", e => {
+        const t = e.touches[0];
+        distX = t.clientX - startX;
+      });
+
+      document.addEventListener("touchend", () => {
+        if (Math.abs(distX) > threshold) {
+          if (distX < 0) {
+            currentSlide = (currentSlide + 1) % slides.length;
+          } else {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+          }
+          showSlide();
+        }
+        distX = 0;
+      });
     })();
+
+    /* ===== Tap-to-next for photo sliders ===== */
+    document.addEventListener("click", e => {
+      const container = e.target.closest(".slider-container");
+      if (!container) return;
+      const imgs = container.querySelectorAll(".slider-img");
+      if (imgs.length < 2) return;
+
+      const curIndex = [...imgs].findIndex(i => i.classList.contains("active"));
+      const next = (curIndex + 1) % imgs.length;
+
+      imgs[curIndex].classList.remove("active");
+      imgs[next].classList.add("active");
+
+      const dots = container.querySelectorAll(".dot");
+      if (dots.length) {
+        dots[curIndex].classList.remove("active-dot");
+        dots[next].classList.add("active-dot");
+      }
+    });
+
+    /* ===== Start ===== */
+    loadData();
+    setInterval(loadData,60000);
+
   </script>
 </body>
 </html>
-
