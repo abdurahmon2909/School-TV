@@ -332,6 +332,8 @@
       if(!text) return "📍";
       text = String(text).toLowerCase();
       if(text.match(/rahbariyat/)) return "👔";
+      if(text.match(/boshlang/)) return "🎈";
+      if(text.match(/tibbiyot|tibbiy/)) return "💊";
       if(text.match(/informat|kompyut|ict|computer|kod/)) return "💻";
       if(text.match(/matem|algebr|➗|matemat/)) return "➗";
       if(text.match(/bio|biolog|🧬/)) return "🧬";
@@ -340,12 +342,10 @@
       if(text.match(/ona|til|tili|language|/)) return "📚";
       if(text.match(/kitob|kutubxona|kutub/)) return "📖";
       if(text.match(/san'at|tasvir|rassom|art/)) return "🎨";
-      if(text.match(/sport|stad|gym/)) return "🏅";
-      if(text.match(/ma'naviyat|maonav|ma'nav/)) return "🕊️";
+      if(text.match(/sport|stad|jismoniy/)) return "🏅";
       if(text.match(/ma'lumot|info|office/)) return "🏢";
-      if(text.match(/tibbiyot|tibbiy/)) return "💊";
-      if(text.match(/chet tili|ingliz/)) return "🔤";
-      if(text.match(/boshlang/)) return "🎈";
+      if(text.match(/chet tili|ingliz/)) return "🇬🇧";
+      
       return "📍"; 
     }
 
@@ -702,4 +702,5 @@
   </script>
 </body>
 </html>
+
 
